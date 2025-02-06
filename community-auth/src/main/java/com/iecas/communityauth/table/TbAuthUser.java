@@ -15,6 +15,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.Comment;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "tb_auth_user")
 public class TbAuthUser {
@@ -56,6 +58,14 @@ public class TbAuthUser {
     @Comment("是否可用")
     @Column(name = "enabled", columnDefinition = "bool default 1")
     private Boolean enabled;
+
+    @Comment("上次登录时间")
+    @Column(name = "last_login_time")
+    private Date lastLoginTime;
+
+    @Comment("上次登录ip")
+    @Column(name = "last_login_ip")
+    private String lastLoginIp;
 
     @Comment("删除位")
     @Column(name = "deleted", columnDefinition = "bool default 0")

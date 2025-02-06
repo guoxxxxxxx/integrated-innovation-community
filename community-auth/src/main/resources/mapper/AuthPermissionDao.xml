@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iecas.communityauth.dao.AuthPermissionDao">
+
+    <resultMap type="com.iecas.communitycommon.model.auth.entity.AuthPermission" id="AuthPermissionMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="deleted" column="deleted" jdbcType="INTEGER"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_community_auth.tb_auth_permission(deleteddescriptionname)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.deleted}#{entity.description}#{entity.name})
+        </foreach>
+    </insert>
+
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_community_auth.tb_auth_permission(deleteddescriptionname)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.deleted}#{entity.description}#{entity.name})
+        </foreach>
+        on duplicate key update
+        deleted = values(deleted) description = values(description) name = values(name)
+    </insert>
+
+</mapper>
+

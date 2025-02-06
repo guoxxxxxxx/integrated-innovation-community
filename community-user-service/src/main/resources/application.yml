@@ -1,10 +1,10 @@
 spring:
   application:
-    name: community-auth
+    name: community-user-service
   datasource:
     username: root
     password: A945855456
-    url: jdbc:mysql://152.136.216.12:3306/db_community_auth?serverTimezone=UTC
+    url: jdbc:mysql://152.136.216.12:3306/db_community_user?serverTimezone=UTC
     type: com.alibaba.druid.pool.DruidDataSource
   jpa:
     hibernate:
@@ -27,6 +27,4 @@ mybatis-plus:
       table-prefix: tb_
 
 server:
-  port: 11001
-  servlet:
-    context-path: /auth
+  port: 11002

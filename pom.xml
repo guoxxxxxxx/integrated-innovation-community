@@ -12,5 +12,8 @@
     <modules>
         <module>community-common</module>
         <module>community-auth</module>
+        <module>community-gateway</module>
+        <module>community-user-service</module>
+        <module>community-video</module>
     </modules>
 </project>

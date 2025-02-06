@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iecas.communityuserservice.dao.UserInfoDao">
+
+    <resultMap type="com.iecas.communitycommon.model.user.entity.UserInfo" id="UserInfoMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="authUserId" column="auth_user_id" jdbcType="INTEGER"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="VARCHAR"/>
+        <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="registerTime" column="register_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_community_user.tb_user_info(auth_user_idavatarbirthdayemailgendernicknamephoneregister_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.authUserId}#{entity.avatar}#{entity.birthday}#{entity.email}#{entity.gender}#{entity.nickname}#{entity.phone}#{entity.registerTime})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_community_user.tb_user_info(auth_user_idavatarbirthdayemailgendernicknamephoneregister_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.authUserId}#{entity.avatar}#{entity.birthday}#{entity.email}#{entity.gender}#{entity.nickname}#{entity.phone}#{entity.registerTime})
+        </foreach>
+        on duplicate key update
+        auth_user_id = values(auth_user_id) avatar = values(avatar) birthday = values(birthday) email = values(email)
+        gender = values(gender) nickname = values(nickname) phone = values(phone) register_time = values(register_time)
+    </insert>
+
+</mapper>
+

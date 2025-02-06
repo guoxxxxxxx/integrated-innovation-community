@@ -3,6 +3,22 @@ spring:
     name: community-gateway
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 152.136.216.12:8848
+    gateway:
+      mvc:
+        routes:
+          - id: community-auth
+            uri: lb://community-auth
+            predicates:
+              - Path=/auth/**
+          - id: community-user-service
+            uri: lb://community-user-service
+            predicates:
+              - Path=/user/**
+
 
 server:
   port: 11000

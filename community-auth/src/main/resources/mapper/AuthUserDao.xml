@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iecas.communityauth.dao.AuthUserDao">
+
+    <resultMap type="com.iecas.communitycommon.model.auth.entity.AuthUser" id="AuthUserMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="accountNonExpired" column="account_non_expired" jdbcType="INTEGER"/>
+        <result property="accountNonLocked" column="account_non_locked" jdbcType="INTEGER"/>
+        <result property="credentialsNonExpired" column="credentials_non_expired" jdbcType="INTEGER"/>
+        <result property="deleted" column="deleted" jdbcType="INTEGER"/>
+        <result property="enabled" column="enabled" jdbcType="INTEGER"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="roleId" column="role_id" jdbcType="INTEGER"/>
+        <result property="userInfoId" column="user_info_id" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="lastLoginIp" column="last_login_ip" jdbcType="VARCHAR"/>
+        <result property="lastLoginTime" column="last_login_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_community_auth.tb_auth_user(account_non_expiredaccount_non_lockedcredentials_non_expireddeletedenabledpasswordrole_iduser_info_idusernamelast_login_iplast_login_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.accountNonExpired}#{entity.accountNonLocked}#{entity.credentialsNonExpired}#{entity.deleted}#{entity.enabled}#{entity.password}#{entity.roleId}#{entity.userInfoId}#{entity.username}#{entity.lastLoginIp}#{entity.lastLoginTime})
+        </foreach>
+    </insert>
+
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_community_auth.tb_auth_user(account_non_expiredaccount_non_lockedcredentials_non_expireddeletedenabledpasswordrole_iduser_info_idusernamelast_login_iplast_login_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.accountNonExpired}#{entity.accountNonLocked}#{entity.credentialsNonExpired}#{entity.deleted}#{entity.enabled}#{entity.password}#{entity.roleId}#{entity.userInfoId}#{entity.username}#{entity.lastLoginIp}#{entity.lastLoginTime})
+        </foreach>
+        on duplicate key update
+account_non_expired = values(account_non_expired) account_non_locked = values(account_non_locked) credentials_non_expired = values(credentials_non_expired) deleted = values(deleted) enabled = values(enabled) password = values(password) role_id = values(role_id) user_info_id = values(user_info_id) username = values(username) last_login_ip = values(last_login_ip) last_login_time = values(last_login_time)     </insert>
+
+</mapper>
+
