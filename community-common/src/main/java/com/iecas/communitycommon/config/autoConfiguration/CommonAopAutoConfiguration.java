@@ -5,7 +5,7 @@
  * @Description:
  */
 
-package com.iecas.communitycommon.config;
+package com.iecas.communitycommon.config.autoConfiguration;
 
 import com.iecas.communitycommon.aop.aspect.LogAspect;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;

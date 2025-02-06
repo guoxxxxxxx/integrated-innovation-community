@@ -4,6 +4,7 @@ package com.iecas.communityauth.controller;
 import com.iecas.communityauth.service.AuthUserService;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.exception.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class AuthUserController {
     @Operation(summary = "测试接口", description = "测试")
     @GetMapping("/test")
     public CommonResult test() {
-        return new CommonResult().data("this is test").success();
+        throw new CommonException("test_exception");
     }
 }
 
