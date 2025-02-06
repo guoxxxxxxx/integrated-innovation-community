@@ -30,3 +30,7 @@ server:
   port: 11001
   servlet:
     context-path: /auth
+
+springdoc:
+  swagger-ui:
+    enabled: true
