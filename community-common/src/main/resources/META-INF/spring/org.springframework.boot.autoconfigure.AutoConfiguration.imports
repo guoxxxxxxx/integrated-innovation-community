@@ -1,2 +1,2 @@
-com.iecas.communitycommon.config.autoConfiguration.CommonAopAutoConfiguration
+com.iecas.communitycommon.config.autoConfiguration.CommonAopAutoConfig
 com.iecas.communitycommon.config.autoConfiguration.CommonGlobalExceptionAutoConfig

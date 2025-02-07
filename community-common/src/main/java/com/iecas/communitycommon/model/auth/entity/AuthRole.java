@@ -2,6 +2,8 @@ package com.iecas.communitycommon.model.auth.entity;
 
 import java.io.Serializable;
 import java.io.Serial;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -11,6 +13,7 @@ import lombok.Data;
  * @since 2025-02-05 20:07:55
  */
 @Data
+@AllArgsConstructor
 public class AuthRole implements Serializable{
     
     @Serial

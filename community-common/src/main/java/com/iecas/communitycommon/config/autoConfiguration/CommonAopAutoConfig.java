@@ -18,5 +18,5 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(AopAutoConfiguration.class)
 @ConditionalOnMissingBean(LogAspect.class)
 @ComponentScan("com.iecas.communitycommon.aop")
-public class CommonAopAutoConfiguration {
+public class CommonAopAutoConfig {
 }

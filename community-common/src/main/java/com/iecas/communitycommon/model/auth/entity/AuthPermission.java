@@ -2,6 +2,8 @@ package com.iecas.communitycommon.model.auth.entity;
 
 import java.io.Serializable;
 import java.io.Serial;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -11,6 +13,7 @@ import lombok.Data;
  * @since 2025-02-05 20:01:19
  */
 @Data
+@AllArgsConstructor
 public class AuthPermission implements Serializable{
     
     @Serial
@@ -26,15 +29,15 @@ public class AuthPermission implements Serializable{
      * 删除位
      */
     private Integer deleted;
+
+    /**
+     * 权限名称
+     */
+    private String name;
     
     /**
      * 权限描述
      */
     private String description;
-    
-    /**
-     * 权限名称
-     */
-    private String name;
 }
 
