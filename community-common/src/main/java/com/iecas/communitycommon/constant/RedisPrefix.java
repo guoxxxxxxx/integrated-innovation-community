@@ -15,8 +15,12 @@ public enum RedisPrefix {
     /**
      * 找回密码验证码前缀
      */
-    AUTH_CODE_RESET("auth:code:reset:")
+    AUTH_CODE_RESET("auth:code:reset:"),
 
+    /**
+     * 登录token
+     */
+    AUTH_LOGIN_TOKEN("auth:login:token:"),
     ;
 
 

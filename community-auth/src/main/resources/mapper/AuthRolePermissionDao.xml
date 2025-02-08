@@ -8,24 +8,5 @@
         <result property="roleId" column="role_id" jdbcType="INTEGER"/>
     </resultMap>
 
-    <!-- 批量插入 -->
-    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into db_community_auth.tb_auth_role_permission(permission_idrole_id)
-        values
-        <foreach collection="entities" item="entity" separator=",">
-            (#{entity.permissionId}#{entity.roleId})
-        </foreach>
-    </insert>
-    <!-- 批量插入或按主键更新 -->
-    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into db_community_auth.tb_auth_role_permission(permission_idrole_id)
-        values
-        <foreach collection="entities" item="entity" separator=",">
-            (#{entity.permissionId}#{entity.roleId})
-        </foreach>
-        on duplicate key update
-        permission_id = values(permission_id) role_id = values(role_id)
-    </insert>
-
 </mapper>
 

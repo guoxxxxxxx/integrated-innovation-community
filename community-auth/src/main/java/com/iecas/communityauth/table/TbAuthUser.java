@@ -31,8 +31,16 @@ public class TbAuthUser {
     @Column(name = "user_info_id")
     private Long userInfoId;
 
+    @Comment("用户邮箱")
+    @Column(name = "email", unique = true)
+    private String email;
+
+    @Comment("用户手机号")
+    @Column(name = "phone", unique = true)
+    private String phone;
+
     @Comment("用户名")
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @Comment("密码")

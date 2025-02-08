@@ -2,6 +2,8 @@ package com.iecas.communitycommon.model.auth.entity;
 
 import java.io.Serializable;
 import java.io.Serial;
+
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -63,10 +65,15 @@ public class AuthUser implements Serializable{
     private Long userInfoId;
     
     /**
-     * 用户名
+     * 用户邮箱
      */
-    private String username;
-    
+    private String email;
+
+    /**
+     * 用户手机号
+     */
+    private String phone;
+
     /**
      * 上次登录ip
      */
@@ -76,5 +83,10 @@ public class AuthUser implements Serializable{
      * 上次登录时间
      */
     private Object lastLoginTime;
+
+    /**
+     * 用户名
+     */
+    private String username;
 }
 

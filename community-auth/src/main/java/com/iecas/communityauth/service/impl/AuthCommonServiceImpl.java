@@ -8,10 +8,13 @@
 package com.iecas.communityauth.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.iecas.communityauth.constant.AuthCodeModeEnum;
 import com.iecas.communityauth.service.AuthCommonService;
+import com.iecas.communityauth.service.AuthUserService;
 import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.exception.CommonException;
+import com.iecas.communitycommon.model.auth.entity.AuthUser;
 import com.iecas.communitycommon.utils.MailUtils;
 import com.iecas.communitycommon.utils.RandomAuthCodeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,9 @@ public class AuthCommonServiceImpl implements AuthCommonService {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    AuthUserService authUserService;
 
 
     /**
@@ -80,6 +86,23 @@ public class AuthCommonServiceImpl implements AuthCommonService {
     @Override
     public void sendAuthCode(String email, String mode, Integer length) {
         String randomAuthCode = RandomAuthCodeUtil.getRandomAuthCode(length);
+
+        // 检测当前用户行为是否合规
+        if (mode.equalsIgnoreCase(AuthCodeModeEnum.REGISTER.name())) {
+            if (authUserService.exists(new LambdaQueryWrapper<AuthUser>()
+                    .eq(AuthUser::getEmail, email))){
+                throw new CommonException("当前用户已经被注册");
+            }
+        }
+        else if (mode.equalsIgnoreCase(AuthCodeModeEnum.RESET.name())) {
+            if (!authUserService.exists(new LambdaQueryWrapper<AuthUser>()
+                    .eq(AuthUser::getEmail, email))){
+                throw new RuntimeException("当前用户尚未注册");
+            }
+        }
+        else if (!mode.equalsIgnoreCase(AuthCodeModeEnum.LOGIN.name())) {
+            throw new RuntimeException("mode must be login, reset and register");
+        }
 
         // 将生成的验证码保存到redis中, 过期时间设置为10分钟
         saveAuthCodeByMode(email, mode, randomAuthCode);

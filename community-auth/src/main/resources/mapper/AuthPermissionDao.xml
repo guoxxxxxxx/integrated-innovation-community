@@ -9,25 +9,5 @@
         <result property="name" column="name" jdbcType="VARCHAR"/>
     </resultMap>
 
-    <!-- 批量插入 -->
-    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into db_community_auth.tb_auth_permission(deleteddescriptionname)
-        values
-        <foreach collection="entities" item="entity" separator=",">
-        (#{entity.deleted}#{entity.description}#{entity.name})
-        </foreach>
-    </insert>
-
-    <!-- 批量插入或按主键更新 -->
-    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into db_community_auth.tb_auth_permission(deleteddescriptionname)
-        values
-        <foreach collection="entities" item="entity" separator=",">
-            (#{entity.deleted}#{entity.description}#{entity.name})
-        </foreach>
-        on duplicate key update
-        deleted = values(deleted) description = values(description) name = values(name)
-    </insert>
-
 </mapper>
 

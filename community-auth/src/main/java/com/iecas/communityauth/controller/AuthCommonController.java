@@ -30,7 +30,7 @@ public class AuthCommonController {
 
 
     @Logger("向指定邮箱发送验证码")
-    @GetMapping("/sendAutoCode")
+    @GetMapping("/sendAuthCode")
     @Operation(summary = "001-向指定邮箱发送验证码", description = "模式参数分别代表注册、登录、找回密码")
     public CommonResult sendAuthCode(@Parameter(description = "邮箱") @RequestParam String email,
                                      @Parameter(description = "模式: register, login, reset") @RequestParam String mode,

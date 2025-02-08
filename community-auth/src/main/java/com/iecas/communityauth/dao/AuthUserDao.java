@@ -16,22 +16,12 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface AuthUserDao extends BaseMapper<AuthUser> {
 
-    /**
-    * 批量新增数据（MyBatis原生foreach方法）
-    *
-    * @param entities List<AuthUser> 实例对象列表
-    * @return 影响行数
-    */
-    int insertBatch(@Param("entities") List<AuthUser> entities);
 
     /**
-    * 批量新增或按主键更新数据（MyBatis原生foreach方法）
-    *
-    * @param entities List<AuthUser> 实例对象列表
-    * @return 影响行数
-    * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入参
-    */
-    int insertOrUpdateBatch(@Param("entities") List<AuthUser> entities);
-
+     * 根据用户id查询用户的权限列表
+     * @param id 用户id
+     * @return {@link List<String>} 用户权限列表
+     */
+    List<String> queryUserPermissionsById(Long id);
 }
 
