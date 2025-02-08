@@ -44,9 +44,9 @@ public class LogAspect {
     public void doBefore(JoinPoint joinPoint) throws Exception{
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
-        log.info("请求 --> url: {}, method: {}, ip: {}, class_method: {}, args: {}",
-                request.getRequestURI(), request.getMethod(), request.getRemoteAddr(), joinPoint.getSignature().getDeclaringType().getName()
-                        + "." + joinPoint.getSignature().getName(), joinPoint.getArgs());
+        log.info("请求 --> url: {}, method: {}, ip: {}, args: {}, class_method: {}",
+                request.getRequestURI(), request.getMethod(), request.getRemoteAddr(), joinPoint.getArgs(),
+                joinPoint.getSignature().getDeclaringType().getName() + "." + joinPoint.getSignature().getName());
     }
 
 

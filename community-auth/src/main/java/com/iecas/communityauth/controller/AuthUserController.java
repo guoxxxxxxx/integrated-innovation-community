@@ -1,6 +1,7 @@
 package com.iecas.communityauth.controller;
 
 
+import com.iecas.communityauth.dto.RegisterDTO;
 import com.iecas.communityauth.service.AuthUserService;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
@@ -34,6 +35,15 @@ public class AuthUserController {
     @GetMapping("/test")
     public CommonResult test() {
         throw new CommonException("test_exception");
+    }
+
+
+    @Logger("用户注册功能")
+    @Operation(summary = "用户注册")
+    @PostMapping("/register")
+    public CommonResult register(@RequestBody RegisterDTO registerDTO) {
+        authUserService.register(registerDTO);
+        return new CommonResult().success().message("注册成功");
     }
 }
 
