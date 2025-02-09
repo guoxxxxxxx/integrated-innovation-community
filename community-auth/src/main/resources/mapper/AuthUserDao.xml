@@ -14,7 +14,7 @@
         <result property="userInfoId" column="user_info_id" jdbcType="INTEGER"/>
         <result property="phone" column="phone" jdbcType="VARCHAR"/>
         <result property="email" column="email" jdbcType="VARCHAR"/>
-        <result property="username" column="username" jdbcType="VARCHAR"/>
+<!--        <result property="username" column="username" jdbcType="VARCHAR"/>-->
         <result property="lastLoginIp" column="last_login_ip" jdbcType="VARCHAR"/>
         <result property="lastLoginTime" column="last_login_time" jdbcType="TIMESTAMP"/>
     </resultMap>

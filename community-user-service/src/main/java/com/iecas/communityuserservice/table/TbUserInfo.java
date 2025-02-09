@@ -29,7 +29,7 @@ public class TbUserInfo {
     private Long id;
 
     @Comment("用户权限关联id")
-    @Column(name = "auth_user_id", columnDefinition = "INT8")
+    @Column(name = "auth_user_id", unique = true, columnDefinition = "INT8")
     private Long authUserId;
 
     @Comment("用户昵称")

@@ -27,7 +27,7 @@ public class LoginUserInfo extends AuthUser implements UserDetails, CredentialsC
 
     @Override
     public String getUsername() {
-        return super.getUsername();
+        return super.getEmail();
     }
 
 

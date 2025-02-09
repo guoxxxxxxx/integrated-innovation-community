@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.io.Serial;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -14,6 +15,7 @@ import lombok.Data;
  * @since 2025-02-05 20:16:12
  */
 @Data
+@Builder
 public class UserInfo implements Serializable{
     
     @Serial

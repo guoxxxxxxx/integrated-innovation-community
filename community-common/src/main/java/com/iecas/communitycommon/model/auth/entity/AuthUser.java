@@ -84,9 +84,9 @@ public class AuthUser implements Serializable{
      */
     private Object lastLoginTime;
 
-    /**
-     * 用户名
-     */
-    private String username;
+//    /**
+//     * 用户名
+//     */
+//    private String username;
 }
 

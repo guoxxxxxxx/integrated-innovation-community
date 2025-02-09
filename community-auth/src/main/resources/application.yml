@@ -18,6 +18,12 @@ spring:
     nacos:
       discovery:
         server-addr: 152.136.216.12:8848
+  rabbitmq:
+    host: 152.136.216.12
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
 mybatis-plus:
   global-config:
     db-config:

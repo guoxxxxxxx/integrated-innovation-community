@@ -8,15 +8,18 @@ import com.iecas.communityauth.entity.LoginUserInfo;
 import com.iecas.communityauth.service.AuthRolePermissionService;
 import com.iecas.communityauth.service.AuthUserService;
 import com.iecas.communitycommon.constant.RedisPrefix;
+import com.iecas.communitycommon.event.UserRegisterEvent;
 import com.iecas.communitycommon.exception.CommonException;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
 import com.iecas.communitycommon.utils.MailUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,16 +34,17 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
 
 
     @Autowired
-    private AuthUserService authUserService;
-
-    @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     @Override
+    @Transactional
     public void register(RegisterDTO registerDTO) {
         if (registerDTO.getUsername() == null) {
             throw new RuntimeException("username参数不能为null");
@@ -53,7 +57,7 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
         }
         else {
             // 判断当前账户是否已经被注册
-            if (authUserService.exists(new LambdaQueryWrapper<AuthUser>()
+            if (baseMapper.exists(new LambdaQueryWrapper<AuthUser>()
                     .eq(AuthUser::getEmail, registerDTO.getUsername()))){
                 throw new CommonException("当前用户已经被注册");
             }
@@ -70,7 +74,12 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
                 throw new RuntimeException("username参数并非手机号或邮箱");
             }
             authUser.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-            authUserService.save(authUser);
+            baseMapper.insert(authUser);
+
+            // 发送RabbitMQ用户注册消息 -> 用户微服务: 同步注册信息
+            UserRegisterEvent userRegisterEvent = UserRegisterEvent.builder().authUserId(authUser.getId())
+                    .email(registerDTO.getUsername()).build();
+            rabbitTemplate.convertAndSend("registerDirectExchange", "user.register", userRegisterEvent);
 
             // 删除redis中的验证码
             stringRedisTemplate.delete(RedisPrefix.AUTH_CODE_REGISTER.getPath(registerDTO.getUsername()));

@@ -39,9 +39,9 @@ public class TbAuthUser {
     @Column(name = "phone", unique = true)
     private String phone;
 
-    @Comment("用户名")
-    @Column(name = "username", unique = true)
-    private String username;
+//    @Comment("用户名")
+//    @Column(name = "username", unique = true)
+//    private String username;
 
     @Comment("密码")
     @Column(name = "password")
