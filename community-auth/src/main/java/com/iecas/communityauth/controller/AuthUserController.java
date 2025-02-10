@@ -63,8 +63,8 @@ public class AuthUserController {
     @Operation(summary = "用户登录")
     @PostMapping("/login")
     public CommonResult login(@RequestBody LoginDTO loginDTO){
-        authUserService.login(loginDTO);
-        return new CommonResult().success().message("登录成功");
+        String token = authUserService.login(loginDTO);
+        return new CommonResult().success().message("登录成功").data("token", token);
     }
 }
 
