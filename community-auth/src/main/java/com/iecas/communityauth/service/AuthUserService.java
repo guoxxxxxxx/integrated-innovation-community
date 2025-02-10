@@ -1,9 +1,12 @@
 package com.iecas.communityauth.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.iecas.communityauth.dto.LoginDTO;
 import com.iecas.communityauth.dto.RegisterDTO;
+import com.iecas.communityauth.dto.ResetDTO;
 import com.iecas.communityauth.entity.LoginUserInfo;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -19,7 +22,7 @@ public interface AuthUserService extends IService<AuthUser> {
      * 用户注册
      * @param registerDTO 注册信息
      */
-    void register(RegisterDTO registerDTO);
+    void register(RegisterDTO registerDTO, HttpServletRequest request);
 
 
     /**
@@ -45,5 +48,19 @@ public interface AuthUserService extends IService<AuthUser> {
      */
     List<String> queryPermissionById(Long id);
 
+
+    /**
+     * 重置密码
+     * @param resetDTO 重置信息
+     */
+    void reset(ResetDTO resetDTO);
+
+
+    /**
+     * 用户登录  [密码 | 登录验证码] 二选一 密码优先
+     * @param loginDTO 登录信息
+     * @return token 用户信息token
+     */
+    String login(LoginDTO loginDTO);
 }
 

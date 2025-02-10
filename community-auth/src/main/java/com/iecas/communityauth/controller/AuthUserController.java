@@ -1,13 +1,16 @@
 package com.iecas.communityauth.controller;
 
 
+import com.iecas.communityauth.dto.LoginDTO;
 import com.iecas.communityauth.dto.RegisterDTO;
+import com.iecas.communityauth.dto.ResetDTO;
 import com.iecas.communityauth.service.AuthUserService;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.exception.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,12 +41,30 @@ public class AuthUserController {
     }
 
 
-    @Logger("用户注册功能")
+    @Logger("用户注册")
     @Operation(summary = "用户注册")
     @PostMapping("/register")
-    public CommonResult register(@RequestBody RegisterDTO registerDTO) {
-        authUserService.register(registerDTO);
+    public CommonResult register(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
+        authUserService.register(registerDTO, request);
         return new CommonResult().success().message("注册成功");
+    }
+
+
+    @Logger("重置密码")
+    @Operation(summary = "重置密码")
+    @PostMapping("/reset")
+    public CommonResult reset(@RequestBody ResetDTO resetDTO){
+        authUserService.reset(resetDTO);
+        return new CommonResult().success().message("修改密码成功");
+    }
+
+
+    @Logger("用户登录")
+    @Operation(summary = "用户登录")
+    @PostMapping("/login")
+    public CommonResult login(@RequestBody LoginDTO loginDTO){
+        authUserService.login(loginDTO);
+        return new CommonResult().success().message("登录成功");
     }
 }
 

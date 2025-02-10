@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,7 +26,19 @@ public class JwtUtils {
 
 
     /**
-     * 创建token使用默认的过期时间
+     * 创建token使用默认的过期时间 7 天
+     * @param username 用户名
+     * @param object 数据
+     * @return token
+     */
+    public static String createToken(String username, Object object){
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(username, claims, EXPIRATION_TIME);
+    }
+
+
+    /**
+     * 创建token使用默认的过期时间 7 天
      * @param username 用户名
      * @param claims 数据
      * @return token
