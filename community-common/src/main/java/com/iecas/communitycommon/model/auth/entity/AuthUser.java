@@ -60,11 +60,6 @@ public class AuthUser implements Serializable{
     private Long roleId;
     
     /**
-     * 用户角色信息id
-     */
-    private Long userInfoId;
-    
-    /**
      * 用户邮箱
      */
     private String email;
@@ -83,10 +78,5 @@ public class AuthUser implements Serializable{
      * 上次登录时间
      */
     private Object lastLoginTime;
-
-//    /**
-//     * 用户名
-//     */
-//    private String username;
 }
 

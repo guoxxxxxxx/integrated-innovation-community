@@ -48,7 +48,7 @@ public class MessageListener {
             // 手动确认消息
             long deliveryTag = message.getMessageProperties().getDeliveryTag();
             channel.basicAck(deliveryTag, false);
-            log.info("注册信息已成功写入用户信息表");
+            log.debug("注册信息已成功写入用户信息表");
         } catch (Exception e) {
             // 消息处理失败, 拒绝消息并重新入队, 后续继续尝试
             long deliveryTag = message.getMessageProperties().getDeliveryTag();

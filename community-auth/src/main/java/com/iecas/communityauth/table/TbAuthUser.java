@@ -27,10 +27,6 @@ public class TbAuthUser {
     @Column(name = "id", unique = true, nullable = false, columnDefinition = "int8 AUTO_INCREMENT")
     private Long id;
 
-    @Comment("用户角色信息id")
-    @Column(name = "user_info_id")
-    private Long userInfoId;
-
     @Comment("用户邮箱")
     @Column(name = "email", unique = true)
     private String email;
@@ -39,16 +35,12 @@ public class TbAuthUser {
     @Column(name = "phone", unique = true)
     private String phone;
 
-//    @Comment("用户名")
-//    @Column(name = "username", unique = true)
-//    private String username;
-
     @Comment("密码")
     @Column(name = "password")
     private String password;
 
     @Comment("角色")
-    @Column(name = "role_id", columnDefinition = "INT8")
+    @Column(name = "role_id", columnDefinition = "INT8 DEFAULT 3")
     private Long roleId;
 
     @Comment("账户是否没过期")
