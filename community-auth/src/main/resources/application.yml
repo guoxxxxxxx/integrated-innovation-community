@@ -1,6 +1,6 @@
 spring:
   application:
-    name: community-auth
+    name: community-auth-service
   datasource:
     username: root
     password: A945855456

@@ -6,9 +6,11 @@ import com.iecas.communityauth.dto.RegisterDTO;
 import com.iecas.communityauth.dto.ResetDTO;
 import com.iecas.communityauth.entity.LoginUserInfo;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
+import com.iecas.communitycommon.model.auth.vo.TokenVO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * (AuthUser)表服务接口
@@ -62,5 +64,17 @@ public interface AuthUserService extends IService<AuthUser> {
      * @return token 用户信息token
      */
     String login(LoginDTO loginDTO);
+
+
+    /**
+     * 验证用户token是否合法
+     * @param token 用户传递过来的token
+     * @return {
+     *     "message": "验证消息",
+     *     "status": "验证结果",
+     *     "claims": object
+     * }
+     */
+    TokenVO parseToken(String token);
 }
 

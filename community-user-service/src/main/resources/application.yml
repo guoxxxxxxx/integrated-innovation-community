@@ -35,4 +35,6 @@ mybatis-plus:
 
 server:
   port: 11002
+  servlet:
+    context-path: /user
 

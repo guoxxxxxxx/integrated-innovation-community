@@ -48,7 +48,7 @@ public class SecurityConfig {
                                 .requestMatchers("/user/login").permitAll()
                                 .requestMatchers("/user/reset").permitAll()
                                 .requestMatchers("/common/sendAuthCode").permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(userDetailsService)

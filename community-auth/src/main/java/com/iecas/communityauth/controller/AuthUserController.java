@@ -8,11 +8,14 @@ import com.iecas.communityauth.service.AuthUserService;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.exception.CommonException;
+import com.iecas.communitycommon.model.auth.vo.TokenVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 /**
@@ -65,6 +68,15 @@ public class AuthUserController {
     public CommonResult login(@RequestBody LoginDTO loginDTO){
         String token = authUserService.login(loginDTO);
         return new CommonResult().success().message("登录成功").data("token", token);
+    }
+
+
+    @Logger("验证用户token")
+    @Operation(summary = "验证用户token是否正确")
+    @PostMapping("/parseToken")
+    public CommonResult parseToken(@RequestParam String token){
+        TokenVO result = authUserService.parseToken(token);
+        return new CommonResult().success().message("方法调用成功").data(result);
     }
 }
 

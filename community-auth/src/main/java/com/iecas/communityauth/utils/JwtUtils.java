@@ -86,11 +86,11 @@ public class JwtUtils {
         } catch (Exception e) {
             if (e instanceof ExpiredJwtException){
                 log.info("Expired JWT token");
-                throw new RuntimeException("Expired JWT token");
+                throw new RuntimeException("token 已经过期, 请重新登录");
             }
             else if (e instanceof JwtException){
                 log.info("Invalid JWT token");
-                throw new RuntimeException("Invalid JWT token");
+                throw new RuntimeException("token不合法");
             }
             log.error("Token parsing error : {}", String.valueOf(e));
             throw new RuntimeException(e);

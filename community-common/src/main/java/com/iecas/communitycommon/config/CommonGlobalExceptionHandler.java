@@ -9,7 +9,9 @@ package com.iecas.communitycommon.config;
 
 
 import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.exception.AuthException;
 import com.iecas.communitycommon.exception.CommonException;
+import com.iecas.communitycommon.exception.IgnoreException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,24 @@ public class CommonGlobalExceptionHandler {
      */
     @ExceptionHandler(CommonException.class)
     public CommonResult handleCommonException(CommonException e){
-        return new CommonResult().status(5000).message(e.getMessage());
+        return new CommonResult().status(5500).message(e.getMessage());
+    }
+
+
+    /**
+     * 权限异常
+     */
+    @ExceptionHandler(AuthException.class)
+    public CommonResult handleAuthException(AuthException e){
+        return new CommonResult().status(5503).message(e.getMessage());
+    }
+
+
+    /**
+     * 可以忽略的异常
+     */
+    @ExceptionHandler(IgnoreException.class)
+    public CommonResult handleIgnoreException(IgnoreException e){
+        return new CommonResult().status(5200).message(e.getMessage());
     }
 }

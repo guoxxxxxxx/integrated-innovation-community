@@ -11,14 +11,19 @@ spring:
       mvc:
         routes:
           - id: community-auth
-            uri: lb://community-auth
+            uri: lb://community-auth-service
             predicates:
-              - Path=/auth/**
+              - Path=${request_prefix}/auth/**
+            filters:
+              - StripPrefix=2
           - id: community-user-service
             uri: lb://community-user-service
             predicates:
-              - Path=/user/**
-
+              - Path=${request_prefix}/user/**
+            filters:
+              - StripPrefix=2
 
 server:
   port: 11000
+
+request_prefix: /api/iic
