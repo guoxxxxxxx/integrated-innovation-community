@@ -175,6 +175,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!--openfeign-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

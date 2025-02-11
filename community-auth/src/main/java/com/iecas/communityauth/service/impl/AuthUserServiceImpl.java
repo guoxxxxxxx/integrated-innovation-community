@@ -13,9 +13,12 @@ import com.iecas.communityauth.utils.JwtUtils;
 import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.event.UserRegisterEvent;
 import com.iecas.communitycommon.exception.CommonException;
+import com.iecas.communitycommon.model.auth.domain.ParseClaims;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
+import com.iecas.communitycommon.model.auth.vo.TokenVO;
 import com.iecas.communitycommon.utils.DateTimeUtils;
 import com.iecas.communitycommon.utils.MailUtils;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -27,7 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -155,6 +160,8 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
         baseMapper.updateById(currentUser);
         // 删除验证码
         stringRedisTemplate.delete(RedisPrefix.AUTH_CODE_RESET.getPath(resetDTO.getEmail()));
+        // 删除redis中的token信息
+        stringRedisTemplate.delete(RedisPrefix.AUTH_LOGIN_TOKEN.getPath(resetDTO.getEmail()));
     }
 
 
@@ -193,6 +200,24 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
             }
         }
         throw new CommonException("当前用户未注册或密码错误");
+    }
+
+
+    @Override
+    public TokenVO parseToken(String token) {
+        TokenVO tokenVO = new TokenVO();
+        try {
+            Claims claims = JwtUtils.parseToken(token);
+            ParseClaims parseClaims = new ParseClaims();
+            BeanUtils.copyProperties(claims, parseClaims);
+            tokenVO.setMessage("验证成功");
+            tokenVO.setStatus(true);
+            tokenVO.setParseClaims(parseClaims);
+        } catch (Exception e) {
+            tokenVO.setMessage(e.getMessage());
+            return tokenVO;
+        }
+        return tokenVO;
     }
 }
 

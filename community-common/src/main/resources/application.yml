@@ -1,4 +1,19 @@
 spring:
   application:
     name: community-common
+  data:
+    redis:
+      host: 152.136.216.12
+      database: 0
+      password: A945855456
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 152.136.216.12:8848
+  rabbitmq:
+    host: 152.136.216.12
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
 
