@@ -14,5 +14,16 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Auth {
 
+
     String value() default "";
+
+    /**
+     * 允许的角色
+     */
+    String[] permitRole() default {};
+
+    /**
+     * 需要的权限
+     */
+    String[] needPermissions() default {};
 }

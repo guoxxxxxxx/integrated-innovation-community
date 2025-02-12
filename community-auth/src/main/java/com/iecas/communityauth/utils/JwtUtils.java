@@ -33,6 +33,7 @@ public class JwtUtils {
      */
     public static String createToken(String username, Object object){
         Map<String, Object> claims = new HashMap<>();
+        claims.put("data", object);
         return createToken(username, claims, EXPIRATION_TIME);
     }
 

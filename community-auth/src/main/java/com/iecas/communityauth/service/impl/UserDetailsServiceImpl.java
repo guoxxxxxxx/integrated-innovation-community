@@ -37,7 +37,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        LoginUserInfo loginUserInfo = new LoginUserInfo();
+        LoginUserInfo loginUserInfo;
 
         // load user information from db
         if (MailUtils.checkEmailIsCorrect(username)) {

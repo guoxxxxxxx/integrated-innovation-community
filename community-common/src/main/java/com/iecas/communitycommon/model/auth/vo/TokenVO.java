@@ -1,38 +1,32 @@
 /**
- * @Time: 2025/2/11 21:33
- * @Author: guoxun
- * @File: TokenVO
- * @Description: 鉴权返回的消息
- */
+@Time: 2025/2/12 12:47
+@Author: guoxun
+@File: TokenVO
+@Description: 
+*/
 
 package com.iecas.communitycommon.model.auth.vo;
 
 
-import com.iecas.communitycommon.model.auth.domain.ParseClaims;
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
 
 
 @Data
-public class TokenVO implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class TokenVO {
 
     /**
-     * 返回消息
+     * 消息
      */
     private String message;
 
     /**
-     * 状态
+     * 解析状态
      */
     private Boolean status;
 
     /**
-     * 对象信息
+     * 信息体
      */
-    private ParseClaims parseClaims;
+    private Object parsedData;
 }

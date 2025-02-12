@@ -13,7 +13,6 @@ import com.iecas.communityauth.utils.JwtUtils;
 import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.event.UserRegisterEvent;
 import com.iecas.communitycommon.exception.CommonException;
-import com.iecas.communitycommon.model.auth.domain.ParseClaims;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
 import com.iecas.communitycommon.model.auth.vo.TokenVO;
 import com.iecas.communitycommon.utils.DateTimeUtils;
@@ -88,7 +87,7 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
             authUser.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
             // 获取用户ip
             authUser.setLastLoginIp(request.getRemoteAddr());
-            authUser.setLastLoginTime(DateTimeUtils.getCurrentDatetime());
+            authUser.setLastLoginTime(DateTimeUtils.getFormatDateTime(System.currentTimeMillis()));
             baseMapper.insert(authUser);
 
             // 发送RabbitMQ用户注册消息 -> 用户微服务: 同步注册信息
@@ -208,11 +207,9 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
         TokenVO tokenVO = new TokenVO();
         try {
             Claims claims = JwtUtils.parseToken(token);
-            ParseClaims parseClaims = new ParseClaims();
-            BeanUtils.copyProperties(claims, parseClaims);
             tokenVO.setMessage("验证成功");
             tokenVO.setStatus(true);
-            tokenVO.setParseClaims(parseClaims);
+            tokenVO.setParsedData(claims);
         } catch (Exception e) {
             tokenVO.setMessage(e.getMessage());
             return tokenVO;

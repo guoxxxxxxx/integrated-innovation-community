@@ -5,6 +5,7 @@ import com.iecas.communityauth.dto.LoginDTO;
 import com.iecas.communityauth.dto.RegisterDTO;
 import com.iecas.communityauth.dto.ResetDTO;
 import com.iecas.communityauth.service.AuthUserService;
+import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.exception.CommonException;
@@ -39,8 +40,9 @@ public class AuthUserController {
     @Logger("测试")
     @Operation(summary = "测试接口", description = "测试")
     @GetMapping("/test")
+    @Auth(permitRole = {"ADMIN"})
     public CommonResult test() {
-        throw new CommonException("test_exception");
+        return new CommonResult().success().message("调用测试接口成功").data("success");
     }
 
 

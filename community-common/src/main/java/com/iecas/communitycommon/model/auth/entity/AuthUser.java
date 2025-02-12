@@ -77,6 +77,6 @@ public class AuthUser implements Serializable{
     /**
      * 上次登录时间
      */
-    private Object lastLoginTime;
+    private String lastLoginTime;
 }
 

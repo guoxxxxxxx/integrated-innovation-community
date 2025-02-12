@@ -21,6 +21,11 @@ public enum RedisPrefix {
      * 登录token
      */
     AUTH_LOGIN_TOKEN("auth:login:token:"),
+
+    /**
+     * 用户角色对应名称前缀
+     */
+    AUTH_ID_MAPPING_ROLE("auth:mapping:id2role:"),
     ;
 
 

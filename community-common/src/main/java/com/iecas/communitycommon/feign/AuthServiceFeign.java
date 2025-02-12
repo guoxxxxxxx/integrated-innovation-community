@@ -12,6 +12,7 @@ import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -23,12 +24,18 @@ public interface AuthServiceFeign {
     /**
      * 验证用户token是否正确
      * @param token 所要验证的token
-     * @return 验证结果：{
-     *     "message": "提示消息",
-     *     "status": true or false,
-     *     "claims": Object, if status is true
-     * }
+     * @return 验证结果
      */
     @PostMapping("/auth/user/parseToken")
     CommonResult parseToken(@RequestParam String token);
+
+
+    /**
+     * 根据id获取角色名称
+     * @param id 角色id
+     * @return 角色名称
+     */
+    @GetMapping("/auth/role/queryRoleNameById")
+    CommonResult queryRoleNameById(@RequestParam(value = "id") Long id);
+
 }

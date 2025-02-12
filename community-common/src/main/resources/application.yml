@@ -17,3 +17,6 @@ spring:
     password: guest
     virtual-host: /
 
+auth-config:
+  enableSSO: false    # 是否开启单点登录 默认为false
+

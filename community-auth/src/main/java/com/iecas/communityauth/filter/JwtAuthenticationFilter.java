@@ -8,6 +8,7 @@
 package com.iecas.communityauth.filter;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.iecas.communityauth.entity.LoginUserInfo;
 import com.iecas.communityauth.utils.JwtUtils;
 import com.iecas.communitycommon.constant.RedisPrefix;
@@ -22,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -35,13 +38,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // get token from header
         String token = request.getHeader("token");
-        if (StringUtils.hasLength(token)) {
+        if (!StringUtils.hasLength(token)) {
             String bearerToken = request.getHeader("Authorization");
             if (StringUtils.hasLength(bearerToken) && bearerToken.startsWith("Bearer ")) {
                 token = bearerToken.substring(7);
@@ -62,7 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 logger.debug("current token maybe is expired.");
                 throw new ExpiredJwtException(null, null, "the token is expired");
             }
-            LoginUserInfo loginUserInfo = JSON.parseObject(JSON.toJSONString(claims), LoginUserInfo.class);
+            JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(claims.get("data")));
+            UserDetails loginUserInfo = userDetailsService.loadUserByUsername(jsonObject.getString("email"));
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loginUserInfo
                     , loginUserInfo.getPassword(), loginUserInfo.getAuthorities()));
         }
