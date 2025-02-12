@@ -1,10 +1,23 @@
 package com.iecas.communityuserservice.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.constant.RedisPrefix;
+import com.iecas.communitycommon.feign.AuthServiceFeign;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communitycommon.utils.CommonResultUtils;
+import com.iecas.communitycommon.utils.RandomExpiredTime;
 import com.iecas.communityuserservice.dao.UserInfoDao;
 import com.iecas.communityuserservice.service.UserInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * (UserInfo)表服务实现类
@@ -15,5 +28,33 @@ import org.springframework.stereotype.Service;
 @Service("userInfoService")
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoDao, UserInfo> implements UserInfoService {
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    AuthServiceFeign authServiceFeign;
+
+
+    @Override
+    public UserInfo queryUserInfoByToken(String token) {
+        // 从缓存中查询
+        String userInfoJson = stringRedisTemplate.opsForValue().get(RedisPrefix.USER_TOKEN_MAPPING_USERINFO.getPath(token));
+        if (StringUtils.hasLength(userInfoJson)){
+            // 命中时更新缓存过期时间
+            stringRedisTemplate.expire(RedisPrefix.USER_TOKEN_MAPPING_USERINFO.getPath(token),
+                    RandomExpiredTime.getRandomExpiredTime(), TimeUnit.MINUTES);
+            return JSON.parseObject(userInfoJson, UserInfo.class);
+        }
+        // 未命中, 查询数据库
+        CommonResult commonResult = authServiceFeign.parseToken(token);
+        JSONObject parseCommonResult = CommonResultUtils.parseCommonResult(commonResult);
+        JSONObject parsedData = JSON.parseObject(JSON.toJSONString(parseCommonResult.get("parsedData")));
+        String currentUserEmail = parsedData.getString("sub");
+        UserInfo userInfo = baseMapper.selectOne(new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getEmail, currentUserEmail));
+        // 添加查询结果至缓存
+        stringRedisTemplate.opsForValue().set(RedisPrefix.USER_TOKEN_MAPPING_USERINFO.getPath(token), JSON.toJSONString(userInfo),
+                RandomExpiredTime.getRandomExpiredTime(), TimeUnit.MINUTES);
+        return userInfo;
+    }
 }
 

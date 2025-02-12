@@ -26,6 +26,11 @@ public enum RedisPrefix {
      * 用户角色对应名称前缀
      */
     AUTH_ID_MAPPING_ROLE("auth:mapping:id2role:"),
+
+    /**
+     * 用户token角色信息映射
+     */
+    USER_TOKEN_MAPPING_USERINFO("user:mapping:token2userinfo:"),
     ;
 
 

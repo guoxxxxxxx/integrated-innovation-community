@@ -14,19 +14,15 @@ import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.exception.AuthException;
-import com.iecas.communitycommon.exception.CommonException;
 import com.iecas.communitycommon.feign.AuthServiceFeign;
 import com.iecas.communitycommon.model.auth.vo.TokenVO;
 import com.iecas.communitycommon.utils.CommonResultUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -53,11 +49,11 @@ public class AuthAspect {
     private static final boolean enableSSO = false;
 
     @Pointcut("@annotation(com.iecas.communitycommon.aop.annotation.Auth)")
-    public void pointCut(){};
+    public void pointCut(){}
 
 
     @Before("pointCut()")
-    public void doBefore(JoinPoint joinPoint) throws Exception{
+    public void doBefore(JoinPoint joinPoint){
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
@@ -71,7 +67,7 @@ public class AuthAspect {
             }
         }
         if (!StringUtils.hasLength(token)){
-            throw new AuthException("token不存在");
+            throw new AuthException("Header中不存在token");
         }
 
         // 解析token

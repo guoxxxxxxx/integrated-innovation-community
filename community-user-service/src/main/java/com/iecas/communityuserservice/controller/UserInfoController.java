@@ -1,9 +1,11 @@
 package com.iecas.communityuserservice.controller;
 
 
+import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.feign.AuthServiceFeign;
+import com.iecas.communitycommon.model.user.entity.UserInfo;
 import com.iecas.communityuserservice.service.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,16 @@ public class UserInfoController{
     @PostMapping("/test")
     public CommonResult test(@RequestParam String token){
         return authServiceFeign.parseToken(token);
+    }
+
+
+    @Logger("通过token查询当前用户信息")
+    @Operation(summary = "通过token查询当前用户信息")
+    @PostMapping("/queryUserInfoByToken")
+    @Auth()
+    public CommonResult queryUserInfoByToken(@RequestParam String token){
+        UserInfo userInfo = userInfoService.queryUserInfoByToken(token);
+        return new CommonResult().success().data(userInfo).message("查询成功");
     }
 }
 

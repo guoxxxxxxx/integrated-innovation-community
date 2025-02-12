@@ -11,5 +11,11 @@ import com.iecas.communitycommon.model.user.entity.UserInfo;
  */
 public interface UserInfoService extends IService<UserInfo> {
 
+    /**
+     * 通过token查询用户的详细信息
+     * @param token 用户的token信息
+     * @return 用户详细信息
+     */
+    UserInfo queryUserInfoByToken(String token);
 }
 

@@ -11,8 +11,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.iecas.communitycommon.common.CommonResult;
 
-import java.util.Map;
-
 public class CommonResultUtils {
 
 
@@ -21,7 +19,7 @@ public class CommonResultUtils {
      * @param commonResult 需要解析的响应体
      * @return JSONObject
      */
-    public static Map<String, Object> parseCommonResult(CommonResult commonResult) {
+    public static JSONObject parseCommonResult(CommonResult commonResult) {
         return JSON.parseObject(commonResult.getJsonData());
     }
 
