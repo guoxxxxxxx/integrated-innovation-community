@@ -15,5 +15,6 @@
         <module>community-gateway</module>
         <module>community-user-service</module>
         <module>community-video</module>
+        <module>community-uploader</module>
     </modules>
 </project>
