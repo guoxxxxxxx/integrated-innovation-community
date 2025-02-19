@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.constant.RedisPrefix;
+import com.iecas.communitycommon.exception.CommonException;
 import com.iecas.communitycommon.feign.AuthServiceFeign;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
 import com.iecas.communitycommon.utils.CommonResultUtils;
@@ -48,6 +49,11 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoDao, UserInfo> impl
         // 未命中, 查询数据库
         CommonResult commonResult = authServiceFeign.parseToken(token);
         JSONObject parseCommonResult = CommonResultUtils.parseCommonResult(commonResult);
+
+        if(!parseCommonResult.getBoolean("status")){
+            throw new CommonException("token 不合法/失效");
+        }
+
         JSONObject parsedData = JSON.parseObject(JSON.toJSONString(parseCommonResult.get("parsedData")));
         String currentUserEmail = parsedData.getString("sub");
         UserInfo userInfo = baseMapper.selectOne(new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getEmail, currentUserEmail));

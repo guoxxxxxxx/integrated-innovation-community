@@ -4,6 +4,8 @@ import java.util.Date;
 import java.io.Serializable;
 import java.io.Serial;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +27,7 @@ public class UserInfo implements Serializable{
     /**
      * 主键
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
     
     /**

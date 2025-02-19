@@ -1,28 +1,30 @@
+host-url: 192.168.247.149
+
 spring:
   application:
     name: community-video-service
   datasource:
     username: root
-    password: A945855456
-    url: jdbc:mysql://152.136.216.12:3306/db_community_video?serverTimezone=UTC
+    password: A123456
+    url: jdbc:mysql://${host-url}:3306/db_community_video?serverTimezone=UTC
     type: com.alibaba.druid.pool.DruidDataSource
   jpa:
     hibernate:
       ddl-auto: update
   data:
     redis:
-      host: 152.136.216.12
+      host: ${host-url}
       database: 0
       password: A945855456
   cloud:
     nacos:
       discovery:
-        server-addr: 152.136.216.12:8848
+        server-addr: ${host-url}:8848
   rabbitmq:
-    host: 152.136.216.12
+    host: ${host-url}
     port: 5672
-    username: guest
-    password: guest
+    username: flashpipi
+    password: A123456
     virtual-host: /
 
 mybatis-plus:

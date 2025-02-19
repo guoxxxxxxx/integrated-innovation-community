@@ -2,11 +2,11 @@ host-url: 192.168.247.149
 
 spring:
   application:
-    name: community-user-service
+    name: community-file-service
   datasource:
     username: root
     password: A123456
-    url: jdbc:mysql://${host-url}:3306/db_community_user?serverTimezone=UTC
+    url: jdbc:mysql://${host-url}:3306/db_community_file?serverTimezone=UTC
     type: com.alibaba.druid.pool.DruidDataSource
   jpa:
     hibernate:
@@ -26,6 +26,10 @@ spring:
     username: flashpipi
     password: A123456
     virtual-host: /
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
 
 mybatis-plus:
   global-config:
@@ -36,7 +40,9 @@ mybatis-plus:
       table-prefix: tb_
 
 server:
-  port: 11002
+  port: 11004
   servlet:
-    context-path: /user
+    context-path: /file
 
+file:
+  default-save-path: G:\save\    # ???????????

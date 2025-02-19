@@ -1,13 +1,13 @@
-package com.iecas.communityuploader;
+package com.iecas.communityfile;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CommunityUploaderApplication {
+public class CommunityFileApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CommunityUploaderApplication.class, args);
+		SpringApplication.run(CommunityFileApplication.class, args);
 	}
 
 }

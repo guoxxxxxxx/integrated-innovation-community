@@ -18,6 +18,7 @@ import com.iecas.communitycommon.model.auth.vo.TokenVO;
 import com.iecas.communitycommon.utils.DateTimeUtils;
 import com.iecas.communitycommon.utils.MailUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -210,8 +211,10 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
             tokenVO.setMessage("验证成功");
             tokenVO.setStatus(true);
             tokenVO.setParsedData(claims);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             tokenVO.setMessage(e.getMessage());
+            tokenVO.setStatus(false);
             return tokenVO;
         }
         return tokenVO;

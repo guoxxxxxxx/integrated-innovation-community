@@ -1,6 +1,8 @@
 package com.iecas.communitycommon.model.auth.entity;
 
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +26,7 @@ public class AuthRolePermission implements Serializable {
     /**
      * 主键
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

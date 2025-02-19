@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.iecas</groupId>
-	<artifactId>community-uploader</artifactId>
+	<artifactId>community-file</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>community-uploader</name>
-	<description>community-uploader</description>
+	<name>community-file</name>
+	<description>community-file</description>
 	<url/>
 	<licenses>
 		<license/>

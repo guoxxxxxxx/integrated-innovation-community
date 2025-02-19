@@ -3,6 +3,7 @@
  * @Author: guoxun
  * @File: AuthDatabaseInitializer
  * @Description: 启动时自动检测数据库并初始化角色和权限
+ * TODO 此处采用硬编码显然是不合理的, 后续需要修改为从配置文件中读取配置信息
  */
 
 package com.iecas.communityauth.config;
