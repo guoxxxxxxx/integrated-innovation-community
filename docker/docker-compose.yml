@@ -10,6 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: A123456
     networks:
       - iic-network
+    restart: always
 
   nacos:
     container_name: iic-nacos
@@ -29,6 +30,7 @@ services:
       - iic-network
     depends_on:
       - mysql
+    restart: always
 
   rabbitmq:
     container_name: iic-rabbitmq
@@ -41,6 +43,7 @@ services:
       RABBITMQ_DEFAULT_PASS: A123456
     networks:
       - iic-network
+    restart: always
 
   redis:
     container_name: iic-redis
@@ -57,6 +60,7 @@ services:
     ]
     networks:
       - iic-network
+    restart: always
 
 networks:
   iic-network:

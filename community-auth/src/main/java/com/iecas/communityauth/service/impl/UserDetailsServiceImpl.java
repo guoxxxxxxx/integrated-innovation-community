@@ -39,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         LoginUserInfo loginUserInfo;
 
-        // load user information from db
+        // load user information TODO 此处可以添加redis缓存
         if (MailUtils.checkEmailIsCorrect(username)) {
             loginUserInfo = authUserService.queryByUserEmail(username);
         } else {

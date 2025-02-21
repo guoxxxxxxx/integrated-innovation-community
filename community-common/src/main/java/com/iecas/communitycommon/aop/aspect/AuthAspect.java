@@ -80,6 +80,9 @@ public class AuthAspect {
                 // 从redis中获取对应的最新token信息
                 String redisToken = stringRedisTemplate.opsForValue().get(RedisPrefix.AUTH_LOGIN_TOKEN
                         .getPath(currentUserInfo.getString("sub")));
+
+                // 解析redis中token的信息
+
                 // 默认只鉴权用户是否登录
                 if (StringUtils.hasLength(redisToken)){
                     log.info("用户: {}, 验证登录成功", currentUserInfo.getString("sub"));
@@ -90,7 +93,7 @@ public class AuthAspect {
                 if (!redisToken.equals(token) && enableSSO){
                     throw new AuthException("账号在其他设备登录, 若不是本人操作请修改密码");
                 }
-                // TODO 精细化鉴权待完成
+                // TODO 精细化鉴权待完成 应该不需要
                 // 获取注解
                 MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
                 Method method = methodSignature.getMethod();

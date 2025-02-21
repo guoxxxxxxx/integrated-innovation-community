@@ -8,16 +8,15 @@
 package com.iecas.communitycommon.feign;
 
 
-import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
-import io.swagger.v3.oas.annotations.Operation;
+import com.iecas.communitycommon.config.feign.CommonFeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-@FeignClient(name = "community-auth-service")
+@FeignClient(name = "community-auth-service", configuration = {CommonFeignConfig.class})
 public interface AuthServiceFeign {
 
 

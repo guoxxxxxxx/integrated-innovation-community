@@ -12,6 +12,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.iecas.communityauth.entity.LoginUserInfo;
 import com.iecas.communityauth.utils.JwtUtils;
 import com.iecas.communitycommon.constant.RedisPrefix;
+import com.iecas.communitycommon.exception.AuthException;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -21,7 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -70,6 +71,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(claims.get("data")));
             UserDetails loginUserInfo = userDetailsService.loadUserByUsername(jsonObject.getString("email"));
+            if (!loginUserInfo.isAccountNonLocked()){
+                logger.debug("current user account is locked.");
+                throw new AuthException("当前账户已被锁定");
+            }
+            if (!loginUserInfo.isEnabled()) {
+                logger.debug("current user account is disabled.");
+                throw new AuthException("当前用户不可用");
+            }
+            if (!loginUserInfo.isCredentialsNonExpired()){
+                logger.debug("current user account credentials expired.");
+                throw new AuthException("当前用户权限已过期");
+            }
+            if (!loginUserInfo.isAccountNonExpired()){
+                logger.debug("current user account accountNonExpired.");
+                throw new AuthException("当前账户已过期");
+            }
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loginUserInfo
                     , loginUserInfo.getPassword(), loginUserInfo.getAuthorities()));
         }

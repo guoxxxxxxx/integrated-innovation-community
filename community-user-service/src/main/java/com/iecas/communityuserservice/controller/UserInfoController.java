@@ -33,6 +33,7 @@ public class UserInfoController{
     @Logger("测试")
     @Operation(summary = "测试")
     @PostMapping("/test")
+    @Auth(permitRole = {"ADMIN", "USER"})
     public CommonResult test(@RequestParam String token){
         return authServiceFeign.parseToken(token);
     }
@@ -41,7 +42,6 @@ public class UserInfoController{
     @Logger("通过token查询当前用户信息")
     @Operation(summary = "通过token查询当前用户信息")
     @PostMapping("/queryUserInfoByToken")
-    @Auth()
     public CommonResult queryUserInfoByToken(@RequestParam String token){
         UserInfo userInfo = userInfoService.queryUserInfoByToken(token);
         return new CommonResult().success().data(userInfo).message("查询成功");

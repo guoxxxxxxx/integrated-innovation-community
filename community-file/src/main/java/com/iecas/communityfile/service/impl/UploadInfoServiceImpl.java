@@ -39,8 +39,13 @@ public class UploadInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> 
             throw new CommonException("请选择所要上传的文件");
         }
 
+        // 提取文件名称和文件类型等元数据
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        String fileType = fileName.substring(fileName.lastIndexOf("."));
         long fileSize = file.getSize();
+
+
+
         try {
             FileUtils.saveFile(DEFAULT_SAVE_PATH + UUID.randomUUID(), dto.getFile().getInputStream());
         } catch (IOException e) {
