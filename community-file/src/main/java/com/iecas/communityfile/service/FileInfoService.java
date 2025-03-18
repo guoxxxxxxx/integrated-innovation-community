@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.iecas.communitycommon.model.file.entity.FileInfo;
 import com.iecas.communityfile.dto.FileUploadDTO;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * (UploadInfo)表服务接口
  *
@@ -18,6 +21,6 @@ public interface FileInfoService extends IService<FileInfo> {
      * @param dto 文件对象
      * @return 写入数据库的信息
      */
-    FileInfo uploadSingleFile(FileUploadDTO dto);
+    FileInfo uploadSingleFile(FileUploadDTO dto) throws IOException, NoSuchAlgorithmException;
 }
 

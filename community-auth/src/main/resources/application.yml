@@ -26,6 +26,8 @@ spring:
     username: flashpipi
     password: A123456
     virtual-host: /
+  cache:
+    type: redis
 mybatis-plus:
   global-config:
     db-config:

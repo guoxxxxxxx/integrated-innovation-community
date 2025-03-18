@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 
-//@EnableFeignClients(basePackages = "com.iecas.communitycommon.feign")
+@EnableFeignClients(basePackages = "com.iecas.communitycommon.feign")
 @EnableDiscoveryClient
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 public class CommunityCommonApplication {

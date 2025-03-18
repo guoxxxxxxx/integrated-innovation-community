@@ -11,12 +11,9 @@ package com.iecas.communitycommon.config.feign;
 import com.alibaba.fastjson2.JSON;
 import com.iecas.communitycommon.entity.FeignResponseEntity;
 import com.iecas.communitycommon.exception.AuthException;
-import com.iecas.communitycommon.exception.CommonException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +26,6 @@ public class FeignErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String s, Response response) {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.body().asInputStream()));
             StringWriter writer = new StringWriter();

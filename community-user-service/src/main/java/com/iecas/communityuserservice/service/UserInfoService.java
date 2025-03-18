@@ -17,5 +17,13 @@ public interface UserInfoService extends IService<UserInfo> {
      * @return 用户详细信息
      */
     UserInfo queryUserInfoByToken(String token);
+
+
+    /**
+     * 通过邮箱查询用户信息
+     * @param email 用户的邮箱
+     * @return 用户信息
+     */
+    UserInfo queryUserInfoByEmail(String email);
 }
 

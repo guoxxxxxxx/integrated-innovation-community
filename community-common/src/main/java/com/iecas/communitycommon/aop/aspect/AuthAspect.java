@@ -12,16 +12,20 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.common.UserThreadLocal;
 import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.exception.AuthException;
 import com.iecas.communitycommon.feign.AuthServiceFeign;
+import com.iecas.communitycommon.feign.UserServiceFeign;
 import com.iecas.communitycommon.model.auth.vo.TokenVO;
+import com.iecas.communitycommon.model.user.entity.UserInfo;
 import com.iecas.communitycommon.utils.CommonResultUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -32,6 +36,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 @Aspect
@@ -43,6 +48,9 @@ public class AuthAspect {
     AuthServiceFeign authServiceFeign;
 
     @Autowired
+    UserServiceFeign userServiceFeign;
+
+    @Autowired
     StringRedisTemplate stringRedisTemplate;
 
     // TODO 这里需要从配置文件中注入，但是目前有点问题
@@ -52,6 +60,9 @@ public class AuthAspect {
     public void pointCut(){}
 
 
+    /**
+     * 用户鉴权
+     */
     @Before("pointCut()")
     public void doBefore(JoinPoint joinPoint){
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -82,6 +93,16 @@ public class AuthAspect {
                         .getPath(currentUserInfo.getString("sub")));
 
                 // 解析redis中token的信息
+                CommonResult redisTokenInfo = authServiceFeign.parseToken(redisToken);
+                TokenVO tokenVO = CommonResultUtils.parseCommonResult(redisTokenInfo, TokenVO.class);
+                Map<String, Object> parsedData = (Map<String, Object>) tokenVO.getParsedData();
+                Map<String, Object> tokenEntity = (Map<String, Object>) parsedData.get("data");
+                // 根据用户邮箱查询用户信息
+                CommonResult userInfoResult = userServiceFeign.queryUserInfoByEmail((String) tokenEntity.get("email"));
+                UserInfo contextUserInfo = CommonResultUtils.parseCommonResult(userInfoResult, UserInfo.class);
+
+                BeanUtils.copyProperties(parsedData.get("data"), contextUserInfo);
+                UserThreadLocal.setUserInfo(contextUserInfo);
 
                 // 默认只鉴权用户是否登录
                 if (StringUtils.hasLength(redisToken)){
@@ -129,5 +150,12 @@ public class AuthAspect {
         else {
             throw new RuntimeException("鉴权服务器异常");
         }
+    }
+
+
+    @After("pointCut()")
+    public void doAfter(JoinPoint joinPoint){
+        // 清除用户线程变量
+        UserThreadLocal.removeUser();
     }
 }

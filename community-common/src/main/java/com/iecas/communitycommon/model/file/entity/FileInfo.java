@@ -76,5 +76,10 @@ public class FileInfo implements Serializable {
      * 原始文件名
      */
     private String originFileName;
+
+    /**
+     * 文件保存路径
+     */
+    private String savePath;
 }
 

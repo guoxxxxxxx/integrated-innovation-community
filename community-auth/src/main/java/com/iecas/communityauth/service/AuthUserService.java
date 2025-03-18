@@ -1,5 +1,6 @@
 package com.iecas.communityauth.service;
 
+import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.iecas.communityauth.dto.LoginDTO;
 import com.iecas.communityauth.dto.RegisterDTO;
@@ -32,6 +33,7 @@ public interface AuthUserService extends IService<AuthUser> {
      * @param email 用户邮箱
      * @return {@link LoginUserInfo}用户权限信息
      */
+    @Cached(name = "auth:user:email2LoginUserInfo", expire = 120, key = "#email")
     LoginUserInfo queryByUserEmail(String email);
 
 

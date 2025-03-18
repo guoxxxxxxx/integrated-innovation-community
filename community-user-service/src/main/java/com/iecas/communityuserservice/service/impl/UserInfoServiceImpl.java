@@ -62,5 +62,12 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoDao, UserInfo> impl
                 RandomExpiredTime.getRandomExpiredTime(), TimeUnit.MINUTES);
         return userInfo;
     }
+
+
+    @Override
+    public UserInfo queryUserInfoByEmail(String email) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<UserInfo>()
+                .eq(UserInfo::getEmail, email));
+    }
 }
 

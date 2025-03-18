@@ -67,4 +67,8 @@ public class TbFileInfo {
     @Comment("文件sha-512")
     @Column(name = "sha512", length = 520)
     private String sha512;
+
+    @Comment("文件保存路径")
+    @Column(name = "save_path")
+    private String savePath;
 }

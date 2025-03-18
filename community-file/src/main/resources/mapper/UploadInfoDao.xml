@@ -11,6 +11,7 @@
         <result property="uploadTime" column="upload_time" jdbcType="TIMESTAMP"/>
         <result property="userId" column="user_id" jdbcType="INTEGER"/>
         <result property="originFileName" column="origin_file_name" jdbcType="VARCHAR"/>
+        <result property="savePath" column="save_path" jdbcType="VARCHAR"/>
     </resultMap>
 
 </mapper>

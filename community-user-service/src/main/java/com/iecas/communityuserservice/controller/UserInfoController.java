@@ -46,5 +46,14 @@ public class UserInfoController{
         UserInfo userInfo = userInfoService.queryUserInfoByToken(token);
         return new CommonResult().success().data(userInfo).message("查询成功");
     }
+
+
+    @Logger("通过用户邮箱查询用户信息")
+    @Operation(summary = "通过用户邮箱查询用户信息")
+    @GetMapping("/queryUserInfoByEmail")
+    public CommonResult queryUserInfoByEmail(@RequestParam String email){
+        UserInfo userInfo = userInfoService.queryUserInfoByEmail(email);
+        return new CommonResult().success().data(userInfo).message("查询成功");
+    }
 }
 

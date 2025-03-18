@@ -11,6 +11,7 @@ package com.iecas.communitycommon.feign;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.config.feign.CommonFeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;

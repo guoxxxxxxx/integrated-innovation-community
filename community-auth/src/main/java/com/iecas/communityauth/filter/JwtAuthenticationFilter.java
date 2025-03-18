@@ -31,6 +31,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Component
@@ -42,9 +44,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    private static final List<String> ALLOW_URLS = Arrays.asList("/auth/user/login",
+            "/auth/user/reset", "/auth/user/register", "/auth/user/sendAuthCode");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        // 无需鉴权的接口直接放行
+        String requestURI = request.getRequestURI();
+        if (ALLOW_URLS.contains(requestURI)){
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // get token from header
         String token = request.getHeader("token");
