@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.iecas.communitycommon.common.UserThreadLocal;
 import com.iecas.communitycommon.exception.CommonException;
 import com.iecas.communitycommon.model.file.entity.FileInfo;
-import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communitycommon.model.file.entity.UploadRecord;
 import com.iecas.communitycommon.utils.FileUtils;
 import com.iecas.communitycommon.utils.ShaUtils;
 import com.iecas.communityfile.dao.UploadInfoDao;
 import com.iecas.communityfile.dto.FileUploadDTO;
 import com.iecas.communityfile.service.FileInfoService;
+import com.iecas.communityfile.service.UploadRecordService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,20 +39,30 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
     @Value("${file.default-save-path}")
     private String DEFAULT_SAVE_PATH;
 
+    @Resource
+    private UploadRecordService uploadRecordService;
+
 
     @Override
     public FileInfo uploadSingleFile(FileUploadDTO dto) throws IOException, NoSuchAlgorithmException {
         FileInfo currnetFileInfo = new FileInfo();
+        UploadRecord currentUploadRecord = new UploadRecord();
         MultipartFile file = dto.getFile();
 
         if (file == null){
             throw new CommonException("请选择所要上传的文件");
         }
 
+        // 设置开始上传时间
+        currentUploadRecord.setUploadStartTime(new Date());
+        currentUploadRecord.setUserId(UserThreadLocal.getUserInfo().getId());
+
         // 提取文件名称和文件类型等元数据
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String fileType = fileName.substring(fileName.lastIndexOf("."));
         long fileSize = file.getSize();
+
+        currentUploadRecord.setFilename(fileName);
 
         // 多层hash校验文件是否已在服务器存在
         // 计算当前文件md5
@@ -59,7 +71,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
 
         // 查询数据库中此文件的md5是否存在
         List<FileInfo> suspectFileList = baseMapper.selectList(new LambdaQueryWrapper<FileInfo>()
-                .eq(FileInfo::getMd5, "fileMd5"));
+                .eq(FileInfo::getMd5, fileMd5));
         // 存在可能相同的文件, 进一步校验
         if (!suspectFileList.isEmpty()){
             // 计算文件sha256
@@ -80,7 +92,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
         currnetFileInfo.setSize(fileSize);
         currnetFileInfo.setOriginFileName(fileName);
         currnetFileInfo.setUploadTime(new Date());
-        currnetFileInfo.setType(fileType);
+        currnetFileInfo.setType(fileType.replace(".", ""));
         currnetFileInfo.setUserId(UserThreadLocal.getUserInfo().getId());
 
         // 当前文件已经在服务器中存在, 直接设置引用即可
@@ -89,18 +101,20 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
             currnetFileInfo.setFileName(existFile.getFileName());
             currnetFileInfo.setSavePath(existFile.getSavePath());
             baseMapper.insert(currnetFileInfo);
+            currentUploadRecord.setUploadAchieveTime(new Date());
+            currentUploadRecord.setFileId(existFile.getId());
+            currentUploadRecord.setStatus("SUCCESS");
+            uploadRecordService.save(currentUploadRecord);
             return currnetFileInfo;
         }
         // 若文件不存在, 则对文件进行上传并保存
         else{
-            currnetFileInfo.setSavePath(DEFAULT_SAVE_PATH + fileName);
-            String newFileName = UUID.randomUUID() + "." + fileType;
+            String newFileName = UUID.randomUUID() + fileType;
+            currnetFileInfo.setSavePath(DEFAULT_SAVE_PATH + newFileName);
             currnetFileInfo.setFileName(newFileName);
             // 对文件进行存储
             try {
                 FileUtils.saveFile(DEFAULT_SAVE_PATH + newFileName, dto.getFile().getInputStream());
-                baseMapper.insert(currnetFileInfo);
-
                 // TODO 此处需要异步计算文件的SHA码, 并进对数据库进行更新 此处暂时按照同步方式进行计算
                 if (currnetFileInfo.getSha256() == null){
                     currnetFileInfo.setSha256(ShaUtils.getFileSHA256(dto.getFile().getInputStream()));
@@ -108,9 +122,16 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
                 if (currnetFileInfo.getSha512() == null){
                     currnetFileInfo.setSha512(ShaUtils.getFileSHA512(dto.getFile().getInputStream()));
                 }
+                baseMapper.insert(currnetFileInfo);
+                currentUploadRecord.setUploadAchieveTime(new Date());
+                currentUploadRecord.setStatus("SUCCESS");
+                currentUploadRecord.setFileId(currnetFileInfo.getId());
+                uploadRecordService.save(currentUploadRecord);
                 return currnetFileInfo;
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
+                currentUploadRecord.setStatus("FAIL");
+                uploadRecordService.save(currentUploadRecord);
                 throw new CommonException("文件上传失败");
             }
         }
