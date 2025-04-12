@@ -1,0 +1,67 @@
+services:
+  mysql:
+    container_name: iic-mysql
+    image: mysql:8.4.4
+    volumes:
+      - /project/community/mysql/data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: A123456
+    networks:
+      - iic-network
+    restart: always
+
+  nacos:
+    container_name: iic-nacos
+    image: nacos/nacos-server:v2.5.0
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    environment:
+      MODE: standalone
+      MYSQL_SERVICE_HOST: iic-mysql
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: db_community_nacos
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: A123456
+      SPRING_DATASOURCE_PLATFORM: mysql
+    networks:
+      - iic-network
+    depends_on:
+      - mysql
+    restart: always
+
+  rabbitmq:
+    container_name: iic-rabbitmq
+    image: rabbitmq:3.13
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: flashpipi
+      RABBITMQ_DEFAULT_PASS: A123456
+    networks:
+      - iic-network
+    restart: always
+
+  redis:
+    container_name: iic-redis
+    image: redis:7.4.2
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_PASSWORD: A123456
+    command: [
+      "redis-server",
+      "--requirepass", "A123456",
+      "--save", "60", "1",
+      "--loglevel", "warning"
+    ]
+    networks:
+      - iic-network
+    restart: always
+
+networks:
+  iic-network:
+    driver: bridge
