@@ -5,7 +5,7 @@
  * @Description: 文件上传 dto
  */
 
-package com.iecas.communityfile.dto;
+package com.iecas.communityfile.pojo.dto;
 
 
 import lombok.Data;

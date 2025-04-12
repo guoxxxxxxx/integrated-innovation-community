@@ -3,7 +3,10 @@ package com.iecas.communitycommon.model.file.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,6 +19,9 @@ import java.util.Date;
  * @since 2025-02-19 17:25:27
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UploadRecord implements Serializable {
 
     @Serial

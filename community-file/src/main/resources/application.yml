@@ -45,4 +45,5 @@ server:
     context-path: /file
 
 file:
-  default-save-path: F:\fileUpload\    # ???????????
+  default-save-path: F:\fileUpload\
+  chunk-size: 5242880  # 5MB

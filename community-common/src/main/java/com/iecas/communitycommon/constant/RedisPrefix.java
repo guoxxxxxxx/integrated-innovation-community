@@ -41,6 +41,11 @@ public enum RedisPrefix {
      * 用户token角色信息映射
      */
     USER_TOKEN_MAPPING_USERINFO("user:mapping:token2userinfo:"),
+
+    /**
+     * 文件分块上传信息
+     */
+    FILE_UPLOAD_CHUNK_INFO("file:upload:chunkInfo:"),
     ;
 
 

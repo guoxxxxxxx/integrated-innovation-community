@@ -11,10 +11,7 @@ import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.exception.CommonException;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -24,6 +21,11 @@ import java.security.NoSuchAlgorithmException;
 
 @Slf4j
 public class FileUtils {
+
+    /**
+     * 缓存块的后缀
+     */
+    private final static String CACHE_REAR =  ".iic_cache_tmp";
 
 
     /**
@@ -111,6 +113,21 @@ public class FileUtils {
 
 
     /**
+     * 计算文件的MD5
+     * @param filePath 文件路径
+     * @return {@link String} md5
+     */
+    public static String calculateMD5(String filePath){
+        try (FileInputStream fileInputStream = new FileInputStream(filePath)){
+            return calculateMD5(fileInputStream);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("md5校验失败");
+        }
+    }
+
+
+    /**
      * 文件写入指定文件
      * @param savePath 所要保存的地址
      * @param inputStream   输入流
@@ -124,5 +141,82 @@ public class FileUtils {
             }
             fileOutputStream.flush();
         }
+    }
+
+
+    /**
+     * 申请保存文件所需的磁盘空间
+     * @param savePath 文件保存路径
+     * @param fileUUID 文件的uuid
+     * @param fileSize 文件大小
+     * @return 所申请的临时文件的名称
+     */
+    public static String applyingDiskSpace(String savePath, String fileUUID, Long fileSize) throws IOException{
+        String cacheFilename = savePath + fileUUID + CACHE_REAR;
+        try (RandomAccessFile raf = new RandomAccessFile(cacheFilename, "rw")){
+            raf.setLength(fileSize);
+        }
+        return cacheFilename;
+    }
+
+
+    /**
+     * 分块写入数据 不能直接调用该方法，调用该方法前，请先调用applyingDiskSpace方法申请空间
+     * @param filepath 缓存块路径，即applyingDiskSpace方法的缓存块存放路径
+     * @param inputStream 输入流
+     * @param chunkMd5 块md5
+     * @param chunkId 块id
+     * @param chunkSize 块大小
+     * @return 是否保存成功
+     * @throws Exception error
+     */
+    public static Boolean writeWithChunk(String filepath, InputStream inputStream, String chunkMd5,
+                                         Integer chunkId, Long chunkSize)
+            throws Exception {
+        byte[] byteArray = toByteArray(inputStream);
+        if (checkFileMd5(new ByteArrayInputStream(byteArray), chunkMd5)){
+            try (RandomAccessFile randomAccessFile = new RandomAccessFile(filepath, "rw")){
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
+                randomAccessFile.seek(chunkId * chunkSize);
+                byte[] buffer = new byte[1024];
+                int len;
+                while (-1 != (len = byteArrayInputStream.read(buffer))){
+                    randomAccessFile.write(buffer, 0, len);
+                }
+            }
+            return true;
+        }
+        else {
+            Files.deleteIfExists(Paths.get(filepath));
+            throw new RuntimeException("md5码校验未通过, 请重新上传文件");
+        }
+    }
+
+
+    /**
+     * md5校验
+     * @param fileInputStream 文件输入流
+     * @param md5 md5
+     * @return true: 校验成功; false: 校验失败;
+     * @throws Exception error
+     */
+    public static Boolean checkFileMd5(InputStream fileInputStream, String md5) throws Exception{
+        String calculateMD5 = calculateMD5(fileInputStream);
+        return calculateMD5.equals(md5);
+    }
+
+
+    /**
+     * 重置文件类型
+     * @param filePath 文件路径
+     * @param originType 原始文件类型
+     * @return 新的文件路径
+     */
+    public static String resumeFileType(String filePath, String originType){
+        File file = new File(filePath);
+        String fileName = file.getName();
+        int lastDotIndex = fileName.lastIndexOf(".");
+        String newFilename = fileName.substring(0, lastDotIndex) + "." + originType;
+        return file.getParent() + File.separator + newFilename;
     }
 }
