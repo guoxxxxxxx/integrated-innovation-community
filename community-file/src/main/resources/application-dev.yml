@@ -1,0 +1,18 @@
+mysql:
+  url: 8.147.220.43
+  port: 33306
+
+redis:
+  url: 8.147.220.43
+  port: 36379
+  password: A123456
+
+nacos:
+  url: 8.147.220.43
+  port: 38848
+
+rabbitmq:
+  url: 8.147.220.43
+  port: 35672
+  username: flashpipi
+  password: A123456
