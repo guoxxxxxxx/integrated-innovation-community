@@ -1,30 +1,31 @@
-host-url: 192.168.247.149
-
 spring:
+  profiles:
+    active: dev
   application:
     name: community-auth-service
   datasource:
     username: root
     password: A123456
-    url: jdbc:mysql://${host-url}:3306/db_community_auth?serverTimezone=UTC
+    url: jdbc:mysql://${mysql.url}:${mysql.port}/db_community_auth?serverTimezone=UTC
     type: com.alibaba.druid.pool.DruidDataSource
   jpa:
     hibernate:
       ddl-auto: update
   data:
     redis:
-      host: ${host-url}
+      host: ${redis.url}
+      port: ${redis.port}
       database: 0
-      password: A123456
+      password: ${redis.password}
   cloud:
     nacos:
       discovery:
-        server-addr: ${host-url}:8848
+        server-addr: ${nacos.url}:${nacos.port}
   rabbitmq:
-    host: ${host-url}
-    port: 5672
-    username: flashpipi
-    password: A123456
+    host: ${rabbitmq.url}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
     virtual-host: /
   cache:
     type: redis
