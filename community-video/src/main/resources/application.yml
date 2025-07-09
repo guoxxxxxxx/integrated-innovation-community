@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: devLocal
   application:
     name: community-video-service
   datasource:

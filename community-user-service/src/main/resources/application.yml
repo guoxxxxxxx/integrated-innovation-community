@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: devLocal
   application:
     name: community-user-service
   datasource:

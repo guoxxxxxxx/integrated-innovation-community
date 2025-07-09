@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# docker中的数据文件
+docker/data
