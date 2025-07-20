@@ -3,7 +3,7 @@ services:
     container_name: iic-mysql
     image: mysql:8.4.4
     volumes:
-      - ./data:/var/lib/mysql
+      - ./mysql/data:/var/lib/mysql
     ports:
       - "3306:3306"
     environment:
@@ -11,6 +11,7 @@ services:
     networks:
       - iic-network
     restart: always
+    privileged: true
 
   nacos:
     container_name: iic-nacos

@@ -9,8 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * (AuthUser)表实体类
- *
+ * 用户权限信息
  * @author guox
  * @since 2025-02-05 20:07:57
  */

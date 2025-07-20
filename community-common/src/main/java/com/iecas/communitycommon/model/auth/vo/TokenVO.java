@@ -29,4 +29,9 @@ public class TokenVO {
      * 信息体
      */
     private Object parsedData;
+
+    /**
+     * http状态码
+     */
+    private int httpCode;
 }

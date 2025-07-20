@@ -2,37 +2,38 @@ package com.iecas.communityauth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iecas.communityauth.dao.AuthUserDao;
 import com.iecas.communityauth.dto.LoginDTO;
 import com.iecas.communityauth.dto.RegisterDTO;
 import com.iecas.communityauth.dto.ResetDTO;
-import com.iecas.communityauth.entity.LoginUserInfo;
-import com.iecas.communityauth.service.AuthRolePermissionService;
 import com.iecas.communityauth.service.AuthUserService;
 import com.iecas.communityauth.utils.JwtUtils;
+import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.event.UserRegisterEvent;
+import com.iecas.communitycommon.exception.AuthException;
 import com.iecas.communitycommon.exception.CommonException;
+import com.iecas.communitycommon.feign.UserServiceFeign;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
 import com.iecas.communitycommon.model.auth.vo.TokenVO;
+import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communitycommon.utils.CommonResultUtils;
 import com.iecas.communitycommon.utils.DateTimeUtils;
 import com.iecas.communitycommon.utils.MailUtils;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,6 +54,9 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Resource
+    private UserServiceFeign userServiceFeign;
 
 
     @Override
@@ -101,39 +105,6 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
         }
     }
 
-
-    @Override
-    public LoginUserInfo queryByUserEmail(String email) {
-
-        // 查询用户信息与权限列表
-        AuthUser authUser = baseMapper.selectOne(new LambdaQueryWrapper<AuthUser>().eq(AuthUser::getEmail, email));
-        List<String> permissionList = baseMapper.queryUserPermissionsById(authUser.getId());
-
-        // 拷贝用户权限信息与权限列表到LoginUserInfo对象中
-        LoginUserInfo loginUserInfo = new LoginUserInfo();
-        BeanUtils.copyProperties(authUser, loginUserInfo);
-        loginUserInfo.setAuthorities(permissionList);
-
-        return loginUserInfo;
-    }
-
-
-    @Override
-    public LoginUserInfo queryByUserPhone(String phone) {
-        LoginUserInfo loginUserInfo = new LoginUserInfo();
-
-        // 查询用户信息与权限列表
-        AuthUser authUser = baseMapper.selectOne(new LambdaQueryWrapper<AuthUser>().eq(AuthUser::getPhone, phone));
-        List<String> permissionList = baseMapper.queryUserPermissionsById(authUser.getId());
-
-        // 拷贝用户权限信息与权限列表到LoginUserInfo对象中
-        BeanUtils.copyProperties(authUser, loginUserInfo);
-        loginUserInfo.setAuthorities(permissionList);
-
-        return loginUserInfo;
-    }
-
-
     @Override
     public List<String> queryPermissionById(Long id) {
         return baseMapper.queryUserPermissionsById(id);
@@ -141,7 +112,7 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
 
 
     @Override
-    public void reset(ResetDTO resetDTO) {
+    public boolean reset(ResetDTO resetDTO) {
         // 检测当前用户是否注册
         AuthUser currentUser = baseMapper.selectOne(new LambdaQueryWrapper<AuthUser>()
                 .eq(AuthUser::getEmail, resetDTO.getEmail()));
@@ -162,6 +133,7 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
         stringRedisTemplate.delete(RedisPrefix.AUTH_CODE_RESET.getPath(resetDTO.getEmail()));
         // 删除redis中的token信息
         stringRedisTemplate.delete(RedisPrefix.AUTH_LOGIN_TOKEN.getPath(resetDTO.getEmail()));
+        return true;
     }
 
 
@@ -212,12 +184,33 @@ public class AuthUserServiceImpl extends ServiceImpl<AuthUserDao, AuthUser> impl
             tokenVO.setStatus(true);
             tokenVO.setParsedData(claims);
         }
+        // 捕获鉴权异常
+        catch (AuthException e) {
+            tokenVO.setMessage(e.getMessage());
+            tokenVO.setStatus(false);
+            tokenVO.setHttpCode(e.getStatusCode());
+            return tokenVO;
+        }
+        // 捕获其他异常
         catch (Exception e) {
             tokenVO.setMessage(e.getMessage());
             tokenVO.setStatus(false);
             return tokenVO;
         }
         return tokenVO;
+    }
+
+
+    @Override
+    public UserInfo parseUserInfoByToken(String token) {
+        Claims claims = JwtUtils.parseToken(token);
+        ObjectMapper objectMapper = new ObjectMapper();
+        AuthUser authInfo = objectMapper.convertValue(claims.get("data"), AuthUser.class);
+        // 根据用户邮箱查询用户详细信息
+        CommonResult commonResult = userServiceFeign.queryUserInfoByEmail(authInfo.getEmail());
+        UserInfo userInfo = CommonResultUtils.parseCommonResult(commonResult, UserInfo.class);
+        userInfo.setAuthInfo(authInfo);
+        return userInfo;
     }
 }
 

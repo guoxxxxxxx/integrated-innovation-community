@@ -5,8 +5,11 @@ import java.io.Serializable;
 import java.io.Serial;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.iecas.communitycommon.model.auth.entity.AuthUser;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +22,8 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserInfo implements Serializable{
     
     @Serial
@@ -70,5 +75,11 @@ public class UserInfo implements Serializable{
      * 注册时间
      */
     private Date registerTime;
+
+    /**
+     * 权限信息
+     */
+    @TableField(exist = false)
+    private AuthUser authInfo;
 }
 

@@ -34,3 +34,6 @@ build/
 
 # docker中的数据文件
 docker/data
+
+# 忽略所有tif文件
+*.tif

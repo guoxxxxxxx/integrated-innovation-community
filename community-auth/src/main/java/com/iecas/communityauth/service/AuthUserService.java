@@ -5,13 +5,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.iecas.communityauth.dto.LoginDTO;
 import com.iecas.communityauth.dto.RegisterDTO;
 import com.iecas.communityauth.dto.ResetDTO;
-import com.iecas.communityauth.entity.LoginUserInfo;
 import com.iecas.communitycommon.model.auth.entity.AuthUser;
 import com.iecas.communitycommon.model.auth.vo.TokenVO;
+import com.iecas.communitycommon.model.user.entity.UserInfo;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * (AuthUser)表服务接口
@@ -21,28 +20,12 @@ import java.util.Map;
  */
 public interface AuthUserService extends IService<AuthUser> {
 
+
     /**
      * 用户注册
      * @param registerDTO 注册信息
      */
     void register(RegisterDTO registerDTO, HttpServletRequest request);
-
-
-    /**
-     * 根据用户邮箱查询用户信息
-     * @param email 用户邮箱
-     * @return {@link LoginUserInfo}用户权限信息
-     */
-    @Cached(name = "auth:user:email2LoginUserInfo", expire = 120, key = "#email")
-    LoginUserInfo queryByUserEmail(String email);
-
-
-    /**
-     * 根据用户手机号查询用户详细信息
-     * @param phone 用户手机号
-     * @return {@link LoginUserInfo}用户权限信息
-     */
-    LoginUserInfo queryByUserPhone(String phone);
 
 
     /**
@@ -56,8 +39,9 @@ public interface AuthUserService extends IService<AuthUser> {
     /**
      * 重置密码
      * @param resetDTO 重置信息
+     * @return  true or false
      */
-    void reset(ResetDTO resetDTO);
+    boolean reset(ResetDTO resetDTO);
 
 
     /**
@@ -78,5 +62,13 @@ public interface AuthUserService extends IService<AuthUser> {
      * }
      */
     TokenVO parseToken(String token);
+
+
+    /**
+     * 根据用户token解析用户信息
+     * @param token 用户token
+     * @return 用户详细信息
+     */
+    UserInfo parseUserInfoByToken(String token);
 }
 

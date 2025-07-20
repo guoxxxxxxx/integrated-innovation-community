@@ -15,10 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/common")
@@ -37,5 +34,15 @@ public class AuthCommonController {
                                      @Parameter(description = "验证码长度") @RequestParam(required = false, defaultValue = "4") Integer length){
         authCommonService.sendAuthCode(email, mode, length);
         return new CommonResult().message("发送成功").success();
+    }
+    
+    
+    @Logger("找回密码--验证验证码是否正确")
+    @PostMapping("/validAuthCode/{email}/{code}")
+    @Operation(summary = "找回密码--验证验证码是否正确")
+    public CommonResult validAuthCode(@Parameter(description = "邮箱") @PathVariable String email,
+                                      @Parameter(description = "验证码") @PathVariable String code){
+        boolean result = authCommonService.validAuthCode(email, code);
+        return new CommonResult().data(result).success();
     }
 }

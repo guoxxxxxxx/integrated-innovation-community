@@ -7,6 +7,8 @@
 
 package com.iecas.communityauth.utils;
 
+import com.iecas.communitycommon.constant.HttpStatusEnum;
+import com.iecas.communitycommon.exception.AuthException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -87,7 +89,7 @@ public class JwtUtils {
         } catch (Exception e) {
             if (e instanceof ExpiredJwtException){
                 log.info("Expired JWT token");
-                throw new RuntimeException("token 已经过期, 请重新登录");
+                throw new AuthException("token 已经过期, 请重新登录", HttpStatusEnum.AUTH_JUMP_LOGIN.getStatusCode());
             }
             else if (e instanceof JwtException){
                 log.info("Invalid JWT token");

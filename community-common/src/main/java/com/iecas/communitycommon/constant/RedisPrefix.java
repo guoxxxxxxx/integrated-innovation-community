@@ -23,6 +23,11 @@ public enum RedisPrefix {
     AUTH_LOGIN_TOKEN("auth:login:token:"),
 
     /**
+     * 验证码发送时间间隙限制
+     */
+    AUTH_CODE_LIMIT("auth:code:limit:"),
+
+    /**
      * 用户角色对应名称前缀
      */
     AUTH_ID_MAPPING_ROLE("auth:mapping:id2role:"),

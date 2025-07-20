@@ -97,11 +97,19 @@ public class AuthCommonServiceImpl implements AuthCommonService {
         else if (mode.equalsIgnoreCase(AuthCodeModeEnum.RESET.name())) {
             if (!authUserService.exists(new LambdaQueryWrapper<AuthUser>()
                     .eq(AuthUser::getEmail, email))){
-                throw new RuntimeException("当前用户尚未注册");
+                throw new CommonException("当前用户尚未注册");
             }
         }
         else if (!mode.equalsIgnoreCase(AuthCodeModeEnum.LOGIN.name())) {
             throw new RuntimeException("mode must be login, reset and register");
+        }
+
+        // 从redis中判断当前用户的验证码是否在30s内已经被发送过一次了
+        boolean exist = stringRedisTemplate.hasKey(RedisPrefix.AUTH_CODE_LIMIT.getPath(email));
+        if (exist){
+            // 获取可以发送验证码的时间间隔
+            Long expire = stringRedisTemplate.getExpire(RedisPrefix.AUTH_CODE_LIMIT.getPath(email), TimeUnit.SECONDS);
+            throw new CommonException("验证码发送频繁, 请 " + expire + " 秒后再试!");
         }
 
         // 将生成的验证码保存到redis中, 过期时间设置为10分钟
@@ -110,6 +118,8 @@ public class AuthCommonServiceImpl implements AuthCommonService {
         // 向用户发送验证码
         try {
             MailUtils.sendRandomCode(randomAuthCode, email, "10");
+            // 向redis中写入验证码发送信息，声明周期为30秒，避免用户在短时间内重复发送验证码
+            stringRedisTemplate.opsForValue().set(RedisPrefix.AUTH_CODE_LIMIT.getPath(email), "limit", 30, TimeUnit.SECONDS);
         } catch (CommonException e) {
             deleteAuthCodeByMode(email, mode);
             throw new CommonException(e.getMessage());
@@ -117,6 +127,18 @@ public class AuthCommonServiceImpl implements AuthCommonService {
             log.error("邮件发送异常", e);
             deleteAuthCodeByMode(email, mode);
             throw new CommonException("邮件发送异常");
+        }
+    }
+
+
+    @Override
+    public boolean validAuthCode(String email, String code) {
+        String s = stringRedisTemplate.opsForValue().get(RedisPrefix.AUTH_CODE_RESET.getPath(email));
+        if (s != null && !s.isEmpty()){
+            return s.equalsIgnoreCase(code);
+        }
+        else{
+            return false;
         }
     }
 }

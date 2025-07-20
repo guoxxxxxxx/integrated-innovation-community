@@ -10,6 +10,7 @@ import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.exception.CommonException;
 import com.iecas.communitycommon.model.auth.vo.TokenVO;
+import com.iecas.communitycommon.model.user.entity.UserInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,8 +60,8 @@ public class AuthUserController {
     @Operation(summary = "重置密码")
     @PostMapping("/reset")
     public CommonResult reset(@RequestBody ResetDTO resetDTO){
-        authUserService.reset(resetDTO);
-        return new CommonResult().success().message("修改密码成功");
+        boolean result = authUserService.reset(resetDTO);
+        return new CommonResult().success().message("修改密码成功").data(result);
     }
 
 
@@ -79,6 +80,14 @@ public class AuthUserController {
     public CommonResult parseToken(@RequestParam String token){
         TokenVO result = authUserService.parseToken(token);
         return new CommonResult().success().message("方法调用成功").data(result);
+    }
+
+
+    @Logger("根据用户token信息获取用户详细信息")
+    @PostMapping("/parseUserInfoByToken/{token}")
+    public CommonResult parseUserInfoByToken(@PathVariable String token){
+        UserInfo userInfo = authUserService.parseUserInfoByToken(token);
+        return new CommonResult().data(userInfo).success();
     }
 }
 

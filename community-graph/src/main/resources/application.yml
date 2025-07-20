@@ -1,0 +1,43 @@
+spring:
+  profiles:
+    active: devLocal
+  application:
+    name: community-graph
+  datasource:
+    username: root
+    password: A123456
+    url: jdbc:mysql://${mysql.url}:${mysql.port}/db_community_graph?serverTimezone=UTC
+    type: com.alibaba.druid.pool.DruidDataSource
+  jpa:
+    hibernate:
+      ddl-auto: update
+  data:
+    redis:
+      host: ${redis.url}
+      port: ${redis.port}
+      database: 0
+      password: ${redis.password}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${nacos.url}:${nacos.port}
+  rabbitmq:
+    host: ${rabbitmq.url}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
+    virtual-host: /
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      table-prefix: tb_
+
+server:
+  port: 11005
+  servlet:
+    context-path: /graph
+

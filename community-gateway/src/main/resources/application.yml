@@ -17,21 +17,23 @@ spring:
             predicates:
               - Path=${request_prefix}/auth/**
             filters:
-              - StripPrefix=2
+              - StripPrefix=3
+
           - id: community-user-service
             uri: lb://community-user-service
             predicates:
               - Path=${request_prefix}/user/**
             filters:
-              - StripPrefix=2
+              - StripPrefix=3
+
           - id: community-uploader-service
             uri: lb://community-file-service
             predicates:
               - Path=${request_prefix}/file/**
             filters:
-              - StripPrefix=2
+              - StripPrefix=3
 
 server:
   port: 11000
 
-request_prefix: /api/iic
+request_prefix: /api/iic/v1

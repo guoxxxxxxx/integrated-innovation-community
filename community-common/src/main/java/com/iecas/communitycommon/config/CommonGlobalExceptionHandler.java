@@ -60,7 +60,7 @@ public class CommonGlobalExceptionHandler {
      */
     @ExceptionHandler(AuthException.class)
     public CommonResult handleAuthException(AuthException e){
-        return new CommonResult().status(5403).message(e.getMessage());
+        return new CommonResult().status(e.getStatusCode()).message(e.getMessage());
     }
 
 

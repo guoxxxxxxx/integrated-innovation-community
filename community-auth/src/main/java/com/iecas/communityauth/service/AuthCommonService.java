@@ -9,4 +9,14 @@ public interface AuthCommonService {
      * @param length 验证码长度
      */
     void sendAuthCode(String email, String mode, Integer length);
+
+
+    /**
+     * 根据邮箱验证找回密码对应的验证码是否正确
+     * @param email 邮箱
+     * @param code 验证码
+     * @return true or false
+     */
+    boolean validAuthCode(String email, String code);
+
 }
