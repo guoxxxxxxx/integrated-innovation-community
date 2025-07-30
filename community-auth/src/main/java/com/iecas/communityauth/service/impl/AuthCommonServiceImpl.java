@@ -57,7 +57,7 @@ public class AuthCommonServiceImpl implements AuthCommonService {
                     authCode, 10, TimeUnit.MINUTES);
         }
         else {
-            throw new RuntimeException("mode must be register or login or reset");
+            throw new RuntimeException("mode must be 'register', 'login' or 'reset'");
         }
     }
 
