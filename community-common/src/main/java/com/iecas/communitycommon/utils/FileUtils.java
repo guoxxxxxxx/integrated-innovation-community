@@ -212,11 +212,19 @@ public class FileUtils {
      * @param originType 原始文件类型
      * @return 新的文件路径
      */
-    public static String resumeFileType(String filePath, String originType){
-        File file = new File(filePath);
-        String fileName = file.getName();
+    public static String resumeFileType(String filePath, String originType) {
+        File oldFile = new File(filePath);
+        String fileName = oldFile.getName();
         int lastDotIndex = fileName.lastIndexOf(".");
         String newFilename = fileName.substring(0, lastDotIndex) + "." + originType;
-        return file.getParent() + File.separator + newFilename;
+
+        File newFile = new File(oldFile.getParent(), newFilename);
+
+        boolean renamed = oldFile.renameTo(newFile);
+        if (!renamed) {
+            throw new RuntimeException("文件重命名失败");
+        }
+
+        return newFile.getAbsolutePath();
     }
 }

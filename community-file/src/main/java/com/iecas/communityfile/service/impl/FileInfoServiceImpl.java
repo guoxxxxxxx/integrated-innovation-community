@@ -206,7 +206,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
 
         FileUploadPreHandleVO cacheEntity = JSON.parseObject(cacheInfo, FileUploadPreHandleVO.class);
 
-        Boolean status = FileUtils.writeWithChunk(DEFAULT_SAVE_PATH + cacheEntity.getNewFilename(), dto.getFile().getInputStream(),
+        Boolean status = FileUtils.writeWithChunk(cacheEntity.getSavePath(), dto.getFile().getInputStream(),
                 dto.getChunkMd5(), dto.getChunkId(), dto.getChunkSize());
         if (status){
             // 更新上传状态
@@ -299,16 +299,18 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
             cacheEntity.resumeFileType();
             // 2-2. 将信息存储至数据库
             FileInfo fileInfo = saveFileInfo(cacheEntity);
-            UploadOtherInfo otherInfo = cacheEntity.getOtherInfo();
-            UserInfo currentUser = UserThreadLocal.getUserInfo();
-            videoServiceFeign.save(VideoInfo.builder()
-                    .description(otherInfo.getDescription())
-                    .fileId(fileInfo.getId())
-                    .modifyTime(new Date())
-                    .tag(otherInfo.getTags().toString())
-                    .title(otherInfo.getTitle())
-                    .uploadTime(fileInfo.getUploadTime())
-                    .userId(currentUser.getId()).build());
+
+            // 根据模式保存相应的其他元信息
+//            UploadOtherInfo otherInfo = cacheEntity.getOtherInfo();
+//            UserInfo currentUser = UserThreadLocal.getUserInfo();
+//            videoServiceFeign.save(VideoInfo.builder()
+//                    .description(otherInfo.getDescription())
+//                    .fileId(fileInfo.getId())
+//                    .modifyTime(new Date())
+//                    .tag(otherInfo.getTags().toString())
+//                    .title(otherInfo.getTitle())
+//                    .uploadTime(fileInfo.getUploadTime())
+//                    .userId(currentUser.getId()).build());
 
             // 2-3 更新上传记录表
             UploadRecord updateRecord = UploadRecord.builder()

@@ -139,7 +139,7 @@ public class FileUploadPreHandleVO {
         for (FileChunkInfo e : this.fileChunkInfoList){
             if (!e.getIsOk()) return false;
         }
-        return false;
+        return true;
     }
 
 

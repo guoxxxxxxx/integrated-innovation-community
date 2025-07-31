@@ -17,6 +17,11 @@ import java.util.ArrayList;
 public class UploadOtherInfo {
 
     /**
+     * 上传模式 NORMAL, VIDEO
+     */
+    private String mode;
+
+    /**
      * 标题
      */
     private String title;
