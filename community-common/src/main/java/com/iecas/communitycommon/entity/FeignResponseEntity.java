@@ -44,6 +44,4 @@ public class FeignResponseEntity {
      * 请求路径
      */
     private String path;
-
-
 }

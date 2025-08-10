@@ -30,7 +30,7 @@ public class TbVideoInfo {
     private Long fileId;
 
     @Comment("标题")
-    @Column(name = "title")
+    @Column(name = "title", length = 32)
     private String title;
 
     @Comment("视频标签")
@@ -38,7 +38,7 @@ public class TbVideoInfo {
     private String tag;
 
     @Comment("视频描述")
-    @Column(name = "description")
+    @Column(name = "description", length = 512)
     private String description;
 
     @Comment("上传用户id")
@@ -58,18 +58,18 @@ public class TbVideoInfo {
     private Boolean deleted;
 
     @Comment("封面图片")
-    @Column(name = "cover_url")
+    @Column(name = "cover_url", columnDefinition = "TEXT")
     private String coverUrl;
 
     @Comment("视频时长/秒")
     @Column(name = "duration")
-    private Long duration;
+    private Double duration;
 
     @Comment("播放量")
-    @Column(name = "view_count")
+    @Column(name = "view_count", columnDefinition = "INT8 DEFAULT 0")
     private Long viewCount;
 
-    @Comment("视频分辨率")
-    @Column(name = "resolution")
+    @Comment("视频分辨率及播放路径, 采用JSON格式进行存储")
+    @Column(name = "resolution", columnDefinition = "TEXT")
     private String resolution;
 }

@@ -38,7 +38,7 @@ public class VideoInfoController {
     @PostMapping("/save")
     public CommonResult save(@RequestBody VideoInfo videoInfo){
         boolean status = videoInfoService.save(videoInfo);
-        return new CommonResult().success().data(status);
+        return new CommonResult().success().data(videoInfo.getId());
     }
 }
 

@@ -13,6 +13,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.common.UserThreadLocal;
+import com.iecas.communitycommon.config.feign.CustomRequestAttributes;
 import com.iecas.communitycommon.constant.HttpStatusEnum;
 import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.exception.AuthException;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -64,18 +66,25 @@ public class AuthAspect {
      */
     @Before("pointCut()")
     public void doBefore(JoinPoint joinPoint){
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        assert attributes != null;
-        HttpServletRequest request = attributes.getRequest();
 
-        // 从请求头部获取token
-        String token = request.getHeader("token");
-        if (!StringUtils.hasLength(token)){
-            String bearerToken = request.getHeader("Authorization");
-            if (StringUtils.hasLength(bearerToken) && bearerToken.startsWith("Bearer ")){
-                token = bearerToken.substring(7);
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        String token = null;
+        if (attributes instanceof ServletRequestAttributes) {
+            ServletRequestAttributes servletAttributes = (ServletRequestAttributes) attributes;
+            HttpServletRequest request = servletAttributes.getRequest();
+            // 从请求头部获取token
+            token = request.getHeader("token");
+            if (!StringUtils.hasLength(token)){
+                String bearerToken = request.getHeader("Authorization");
+                if (StringUtils.hasLength(bearerToken) && bearerToken.startsWith("Bearer ")){
+                    token = bearerToken.substring(7);
+                }
             }
+        } else if (attributes instanceof CustomRequestAttributes) {
+            CustomRequestAttributes customAttributes = (CustomRequestAttributes) attributes;
+            token = customAttributes.getToken();
         }
+
         if (!StringUtils.hasLength(token)){
             // 不存在token时告知前端跳转到登陆界面
             throw new AuthException("Header中不存在token", HttpStatusEnum.AUTH_JUMP_LOGIN.getStatusCode());

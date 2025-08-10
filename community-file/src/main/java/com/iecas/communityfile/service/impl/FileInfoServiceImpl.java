@@ -3,23 +3,33 @@ package com.iecas.communityfile.service.impl;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.common.UserThreadLocal;
+import com.iecas.communitycommon.config.feign.CustomRequestAttributes;
 import com.iecas.communitycommon.constant.RedisPrefix;
+import com.iecas.communitycommon.constant.TranscodeStatusEnum;
+import com.iecas.communitycommon.constant.UploadEnum;
 import com.iecas.communitycommon.exception.CommonException;
 import com.iecas.communitycommon.feign.VideoServiceFeign;
 import com.iecas.communitycommon.model.file.entity.FileInfo;
 import com.iecas.communitycommon.model.file.entity.UploadRecord;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communitycommon.model.video.entity.TranscodeInfo;
 import com.iecas.communitycommon.model.video.entity.VideoInfo;
+import com.iecas.communitycommon.utils.CommonResultUtils;
 import com.iecas.communitycommon.utils.FileUtils;
 import com.iecas.communitycommon.utils.ShaUtils;
+import com.iecas.communitycommon.utils.VideoUtils;
+import com.iecas.communityfile.config.GlobalThreadPools;
 import com.iecas.communityfile.dao.UploadInfoDao;
+import com.iecas.communityfile.pojo.dto.CoverUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadMultiBlockDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadPreHandleDTO;
 import com.iecas.communityfile.pojo.middleEntity.UploadOtherInfo;
 import com.iecas.communityfile.pojo.vo.CheckFileUploadIsOkVO;
 import com.iecas.communityfile.pojo.vo.FileUploadPreHandleVO;
+import com.iecas.communityfile.service.FfmpegService;
 import com.iecas.communityfile.service.FileInfoService;
 import com.iecas.communityfile.service.UploadRecordService;
 import jakarta.annotation.Resource;
@@ -29,6 +39,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
@@ -52,6 +64,9 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
     @Value("${file.default-save-path}")
     private String DEFAULT_SAVE_PATH;
 
+    @Value("${file.default-output-path}")
+    private String DEFAULT_OUTPUT_PATH;
+
     @Value("${file.chunk-size}")
     private Long CHUNK_SIZE;
 
@@ -63,6 +78,9 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
 
     @Resource
     VideoServiceFeign videoServiceFeign;
+
+    @Resource
+    FfmpegService ffmpegService;
 
 
     @Override
@@ -301,16 +319,73 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
             FileInfo fileInfo = saveFileInfo(cacheEntity);
 
             // 根据模式保存相应的其他元信息
-//            UploadOtherInfo otherInfo = cacheEntity.getOtherInfo();
-//            UserInfo currentUser = UserThreadLocal.getUserInfo();
-//            videoServiceFeign.save(VideoInfo.builder()
-//                    .description(otherInfo.getDescription())
-//                    .fileId(fileInfo.getId())
-//                    .modifyTime(new Date())
-//                    .tag(otherInfo.getTags().toString())
-//                    .title(otherInfo.getTitle())
-//                    .uploadTime(fileInfo.getUploadTime())
-//                    .userId(currentUser.getId()).build());
+            UploadOtherInfo otherInfo = cacheEntity.getOtherInfo();
+            UserInfo currentUser = UserThreadLocal.getUserInfo();
+
+            // 判断任务类型
+            // 1. 视频任务逻辑 TODO 此处测试固定设置为真
+            if (otherInfo.getTaskType().equalsIgnoreCase("VIDEO") || true){
+                // TODO 此处需要根据视频文件路径计算视频的时长
+                double videoDurationSeconds = VideoUtils.getVideoDurationSeconds(cacheEntity.getSavePath());
+                // 保存其他元信息至视频数据库
+                CommonResult saveVideoResult = videoServiceFeign.save(
+                        VideoInfo.builder()
+                                .description(otherInfo.getVideoMetadata().getDescription())
+                                .fileId(fileInfo.getId())
+                                .modifyTime(new Date())
+                                .tag(otherInfo.getVideoMetadata().getTags().toString())
+                                .title(otherInfo.getVideoMetadata().getTitle())
+                                .uploadTime(new Date())
+                                .userId(currentUser.getId())
+                                .coverUrl(otherInfo.getVideoMetadata().getCoverUrl())
+                                .duration(videoDurationSeconds)
+                                .build()
+                );
+                Long videoId = CommonResultUtils.parseCommonResult(saveVideoResult, Long.class);
+
+                // 创建视频转码任务记录
+                TranscodeInfo transcodeInfo = TranscodeInfo.builder()
+                        .vid(videoId)
+                        .createTime(new Date())
+                        .transcodePath(DEFAULT_OUTPUT_PATH)
+                        .status(TranscodeStatusEnum.PENDING.getSTATUS())
+                        .build();
+                CommonResult saveTranscodeInfoCommonResult = videoServiceFeign.saveTranscodeInfo(transcodeInfo);
+                Long transcodeId = CommonResultUtils.parseCommonResult(saveTranscodeInfoCommonResult, Long.class);
+                transcodeInfo.setId(transcodeId);
+
+                // 异步进行视频转码
+                RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+                CustomRequestAttributes customRequestAttributes = new CustomRequestAttributes(requestAttributes);
+                GlobalThreadPools.pool.execute(() -> {
+                    try {
+                        // 更新转码任务的状态信息
+                        RequestContextHolder.setRequestAttributes(customRequestAttributes);
+                        transcodeInfo.setStatus(TranscodeStatusEnum.RUNNING.getSTATUS());
+                        videoServiceFeign.transcodeInfoUpdate(transcodeInfo);
+                        boolean result = ffmpegService.transcodeToHls(cacheEntity.getSavePath());
+                        if (result){
+                            // 转码成功后更新转码任务状态信息
+                            transcodeInfo.setAchievedTime(new Date());
+                            transcodeInfo.setStatus(TranscodeStatusEnum.SUCCESS.getSTATUS());
+                            videoServiceFeign.transcodeInfoUpdate(transcodeInfo);
+                        }
+                        else {
+                            // 失败时更新对应人物状态信息
+                            transcodeInfo.setStatus(TranscodeStatusEnum.FAIL.getSTATUS());
+                            videoServiceFeign.transcodeInfoUpdate(transcodeInfo);
+                        }
+                    } catch (Exception e) {
+                        // 失败时更新对应人物状态信息
+                        transcodeInfo.setStatus(TranscodeStatusEnum.FAIL.getSTATUS());
+                        videoServiceFeign.transcodeInfoUpdate(transcodeInfo);
+                        log.error("视频转码异常", e);
+                    } finally {
+                        RequestContextHolder.resetRequestAttributes();
+                    }
+                });
+
+            }
 
             // 2-3 更新上传记录表
             UploadRecord updateRecord = UploadRecord.builder()
@@ -327,6 +402,77 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
         return CheckFileUploadIsOkVO.builder()
                 .failChunksIdList(null)
                 .status(true).build();
+    }
+
+
+    @Override
+    public String videoCoverUpload(CoverUploadDTO dto) throws IOException {
+        // 获取当前登录对象用户信息
+        UserInfo currentUser = UserThreadLocal.getUserInfo();
+
+        // 为当前图片生成一个随机的uuid作为当前文件的新名称
+        String uuid = UUID.randomUUID().toString();
+
+        // 获取当前图片的类型
+        String[] split = dto.getOriginName().split("\\.");
+        String type = split[split.length - 1];
+
+        // 创建上传状态信息记录 并 保存
+        UploadRecord uploadRecord = UploadRecord.builder()
+                .status(UploadEnum.RUNNING.getValue())
+                .userId(currentUser.getId())
+                .filename(uuid + "." + type)
+                .uploadStartTime(new Date())
+                .build();
+        uploadRecordService.save(uploadRecord);
+
+        // 保存相关元数据信息
+        FileInfo currentFileInfo = FileInfo.builder()
+                .fileName(uuid + "." + type)
+                .md5(dto.getMd5())
+                .uploadTime(new Date())
+                .userId(currentUser.getId())
+                .originFileName(dto.getOriginName())
+                .size(dto.getSize())
+                .savePath(FileUtils.pathJoin(DEFAULT_SAVE_PATH, uuid + "." + type))
+                .type(type)
+                .build();
+
+        String currentMd5 = "";
+        try {
+            currentMd5 = FileUtils.calculateMD5(dto.getFile().getInputStream());
+        } catch (Exception e) {
+            // 更新上传状态信息为失败
+            uploadRecord.setStatus(UploadEnum.FAIL.getValue());
+            uploadRecordService.updateById(uploadRecord);
+            throw new RuntimeException("文件md5码计算错误");
+        }
+        if (!currentMd5.isEmpty() && dto.getMd5().equals(currentMd5)){
+            // 对文件进行保存
+            boolean status = FileUtils.saveFile(FileUtils.pathJoin(DEFAULT_SAVE_PATH, uuid + "." + type),
+                    dto.getFile().getInputStream());
+            if (status){
+                baseMapper.insert(currentFileInfo);
+                // 更新上传记录信息表
+                uploadRecord.setFileId(currentFileInfo.getId());
+                uploadRecord.setStatus(UploadEnum.SUCCESS.getValue());
+                uploadRecord.setUploadAchieveTime(new Date());
+                uploadRecordService.updateById(uploadRecord);
+                return FileUtils.pathJoin(DEFAULT_SAVE_PATH, uuid + "." + type);
+            }
+            else {
+                // 更新上传状态信息为失败
+                uploadRecord.setStatus(UploadEnum.FAIL.getValue());
+                uploadRecordService.updateById(uploadRecord);
+                throw new CommonException("上传失败，请重试!");
+            }
+        }
+        else{
+            // 更新上传状态信息为失败
+            uploadRecord.setStatus(UploadEnum.FAIL.getValue());
+            uploadRecordService.updateById(uploadRecord);
+            throw new CommonException("文件md5校验失败，请重新上传");
+        }
     }
 }
 

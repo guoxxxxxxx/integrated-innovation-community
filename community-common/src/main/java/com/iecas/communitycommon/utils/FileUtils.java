@@ -96,7 +96,7 @@ public class FileUtils {
      * @return {@link String} md5
      * @throws IOException, NoSuchAlgorithmException
      */
-    private static String calculateMD5(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+    public static String calculateMD5(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] buffer = new byte[1024];
         int read;
@@ -226,5 +226,23 @@ public class FileUtils {
         }
 
         return newFile.getAbsolutePath();
+    }
+
+
+    /**
+     * 放照python中的OS.path.join方法构造的路径拼接器
+     * @param args 所要拼接的路径参数
+     * @return 拼接完成的路径参数
+     */
+    public static String pathJoin(String ... args){
+        String SPLIT = "/";
+        StringBuilder result = new StringBuilder();
+        for(int i=0; i<args.length; i++){
+            result.append(args[i]);
+            if (i != args.length - 1){
+                result.append(SPLIT);
+            }
+        }
+        return result.toString();
     }
 }

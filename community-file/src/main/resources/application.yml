@@ -48,4 +48,6 @@ server:
 file:
   #  default-save-path: F:\fileUpload\      # Windows环境下默认存储路径
   default-save-path: /home/guox/file/      # Linux环境下默认存储路径
+  default-output-path: /home/guox/file/output/      # Linux环境下默认存储路径
+  default-ffmpeg-path: /usr/bin/ffmpeg
   chunk-size: 5242880  # 5MB 分块大小默认为5MB

@@ -1,10 +1,12 @@
 package com.iecas.communitycommon.model.video.entity;
 
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,9 +18,6 @@ import java.util.Date;
  * @author guox
  * @since 2025-03-29 15:23:30
  */
-
-
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -72,6 +71,26 @@ public class VideoInfo implements Serializable {
      * 上传用户id
      */
     private Long userId;
-    
+
+    /**
+     * 封面图片
+     */
+    private String coverUrl;
+
+    /**
+     * 视频时长/秒
+     */
+    private Double duration;
+
+    /**
+     * 播放量
+     */
+    private Long viewCount;
+
+    /**
+     * 视频分辨率及播放路径, 采用JSON格式进行存储
+     */
+    private String resolution;
+
 }
 

@@ -5,6 +5,7 @@ import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.model.file.entity.FileInfo;
+import com.iecas.communityfile.pojo.dto.CoverUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadMultiBlockDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadPreHandleDTO;
@@ -65,14 +66,23 @@ public class UploadController{
     }
 
 
-
     @Auth
     @Logger("查询当前文件是否上传成功")
     @GetMapping("/checkFileUploadIsOk")
     @Operation(summary = "查询当前文件是否上传成功")
-    public CommonResult checkFileUploadIsOk(@RequestParam String fileUUID) throws IOException, NoSuchAlgorithmException {
+    public CommonResult checkFileUploadIsOk(@RequestParam String fileUUID) throws IOException, NoSuchAlgorithmException, InterruptedException {
         CheckFileUploadIsOkVO result = fileInfoService.checkFileUploadIsOk(fileUUID);
         return new CommonResult().success().data(result);
+    }
+
+
+    @Auth
+    @Logger("视频封面图片上传")
+    @PostMapping("/videoCoverUpload")
+    @Operation(summary = "视频封面图片上传")
+    public CommonResult videoCoverUpload(@ModelAttribute CoverUploadDTO dto) throws IOException{
+        String url = fileInfoService.videoCoverUpload(dto);
+        return new CommonResult().success().data(url);
     }
 
 }

@@ -8,31 +8,21 @@
 package com.iecas.communityfile.pojo.middleEntity;
 
 
+import com.iecas.communityfile.pojo.middleEntity.metainfo.VideoMetadata;
 import lombok.Data;
-
-import java.util.ArrayList;
+import java.util.List;
 
 
 @Data
 public class UploadOtherInfo {
 
     /**
-     * 上传模式 NORMAL, VIDEO
+     * 任务类型 NORMAL, VIDEO
      */
-    private String mode;
+    private String taskType;
 
     /**
-     * 标题
+     * 视频文件对应的元数据信息
      */
-    private String title;
-
-    /**
-     * 描述
-     */
-    private String description;
-
-    /**
-     * 标签
-     */
-    private ArrayList<String> tags;
+    private VideoMetadata videoMetadata;
 }

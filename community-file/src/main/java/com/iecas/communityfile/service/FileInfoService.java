@@ -2,6 +2,7 @@ package com.iecas.communityfile.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.iecas.communitycommon.model.file.entity.FileInfo;
+import com.iecas.communityfile.pojo.dto.CoverUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadMultiBlockDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadPreHandleDTO;
@@ -49,6 +50,14 @@ public interface FileInfoService extends IService<FileInfo> {
      * @param fileUUID 文件uuid
      * @return 文件上传状态 及失败列表
      */
-    CheckFileUploadIsOkVO checkFileUploadIsOk(String fileUUID) throws IOException, NoSuchAlgorithmException;
+    CheckFileUploadIsOkVO checkFileUploadIsOk(String fileUUID) throws IOException, NoSuchAlgorithmException, InterruptedException;
+
+
+    /**
+     * 上传视频封面图片
+     * @param dto 相关参数
+     * @return 图片在服务器中的路径地址
+     */
+    String videoCoverUpload(CoverUploadDTO dto) throws IOException;
 }
 

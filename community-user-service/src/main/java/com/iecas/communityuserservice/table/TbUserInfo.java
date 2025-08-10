@@ -49,7 +49,7 @@ public class TbUserInfo {
     private String avatar;
 
     @Comment("性别")
-    @Column(name = "gender")
+    @Column(name = "gender", length = 8)
     private String gender;
 
     @Comment("注册时间")
