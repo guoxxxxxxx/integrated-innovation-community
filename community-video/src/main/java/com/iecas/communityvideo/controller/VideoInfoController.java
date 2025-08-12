@@ -5,7 +5,9 @@ package com.iecas.communityvideo.controller;
 import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.common.PageResult;
 import com.iecas.communitycommon.model.video.entity.VideoInfo;
+import com.iecas.communityvideo.pojo.Params.QueryCondition;
 import com.iecas.communityvideo.service.VideoInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
@@ -40,5 +42,31 @@ public class VideoInfoController {
         boolean status = videoInfoService.save(videoInfo);
         return new CommonResult().success().data(videoInfo.getId());
     }
+
+
+    @Logger("获取视频列表")
+    @GetMapping("/getPage")
+    public CommonResult getPage(QueryCondition condition){
+        PageResult<VideoInfo> result = videoInfoService.getPage(condition);
+        return new CommonResult().success().data(result);
+    }
+
+
+    @Auth
+    @Logger("根据id更新视频信息")
+    @PutMapping()
+    public CommonResult updateById(@RequestBody VideoInfo videoInfo){
+        boolean b = videoInfoService.updateById(videoInfo);
+        return new CommonResult().data(b).success();
+    }
+
+
+    @Logger("根据id查询视频详细信息")
+    @GetMapping("/{id}")
+    public CommonResult queryVideoInfoById(@PathVariable(name = "id") Long id){
+        VideoInfo videoInfo = videoInfoService.getById(id);
+        return new CommonResult().data(videoInfo).success();
+    }
+
 }
 

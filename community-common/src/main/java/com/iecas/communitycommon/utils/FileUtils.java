@@ -29,6 +29,25 @@ public class FileUtils {
 
 
     /**
+     * 创建文件夹
+     * @param path 所要创建的目录
+     * @return boolean创建的成功与否
+     */
+    public static boolean mkdir(String path){
+        if (path == null || path.trim().isEmpty()) {
+            return false; // 路径为空
+        }
+
+        File dir = new File(path);
+        if (dir.exists()) {
+            return dir.isDirectory(); // 如果存在但不是文件夹，就返回 false
+        }
+
+        return dir.mkdirs(); // 创建多级目录
+    }
+
+
+    /**
      * 保存所要上传的文件 需验证md5
      * @param savePath 文件保存路径
      * @param md5 文件的md5码
@@ -133,6 +152,11 @@ public class FileUtils {
      * @param inputStream   输入流
      */
     public static void write(String savePath, InputStream inputStream) throws IOException{
+        // 提取文件的名称
+        String[] split = savePath.split("/");
+        String fileName = split[split.length - 1];
+        String dirs = savePath.replace("/" + fileName, "");
+        mkdir(dirs);
         try (FileOutputStream fileOutputStream = new FileOutputStream(savePath)){
             byte[] buffer = new byte[1024];
             int len;

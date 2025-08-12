@@ -1,3 +1,4 @@
 com.iecas.communitycommon.config.autoConfiguration.CommonAopAutoConfig
 com.iecas.communitycommon.config.autoConfiguration.CommonGlobalExceptionAutoConfig
 com.iecas.communitycommon.config.autoConfiguration.CommonAutoRabbitConfig
+com.iecas.communitycommon.config.autoConfiguration.CommonMyBatisPlusAutoConfig

@@ -33,6 +33,20 @@ spring:
             filters:
               - StripPrefix=3
 
+          - id: community-video-service
+            uri: lb://community-video-service
+            predicates:
+              - Path=${request_prefix}/video/**
+            filters:
+              - StripPrefix=3
+
+          - id: community-graph-service
+            uri: lb://community-graph-service
+            predicates:
+              - Path=${request_prefix}/graph/**
+            filters:
+              - StripPrefix=3
+
 server:
   port: 11000
 

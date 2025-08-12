@@ -1,6 +1,9 @@
 package com.iecas.communitycommon.model.video.entity;
 
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +33,7 @@ public class VideoInfo implements Serializable {
     /**
      * 主键
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
     
     /**
@@ -91,6 +95,18 @@ public class VideoInfo implements Serializable {
      * 视频分辨率及播放路径, 采用JSON格式进行存储
      */
     private String resolution;
+
+    /**
+     * 获取视频封面图片
+     */
+    @JsonProperty("coverName")
+    private String getCoverName(){
+        if (this.coverUrl == null){
+            return null;
+        }
+        String[] split = this.coverUrl.split("/");
+        return split[split.length - 1];
+    }
 
 }
 

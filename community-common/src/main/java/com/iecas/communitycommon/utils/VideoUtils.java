@@ -1,7 +1,10 @@
 package com.iecas.communitycommon.utils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Time: 2025/8/9 22:33
@@ -66,5 +69,39 @@ public class VideoUtils {
         int minutes = (totalSeconds % 3600) / 60;
         int secs = totalSeconds % 60;
         return String.format("%02d:%02d:%02d", hours, minutes, secs);
+    }
+
+
+    /**
+     * 获取视频的宽高分辨率
+     * @param ffmpegPath ffmpeg可执行路径
+     * @param inputPath 视频文件路径
+     * @return int[]{width, height}
+     */
+    public static int[] getVideoResolution(String ffmpegPath, String inputPath) throws IOException, InterruptedException {
+        ProcessBuilder probe = new ProcessBuilder(
+                ffmpegPath, "-i", inputPath
+        );
+        probe.redirectErrorStream(true); // 将错误输出合并到标准输出
+        Process p = probe.start();
+
+        String output = new String(p.getInputStream().readAllBytes());
+        p.waitFor();
+
+        // 匹配分辨率模式，如 1920x1080
+        Pattern pattern = Pattern.compile("(\\d{2,5})x(\\d{2,5})");
+        Matcher matcher = pattern.matcher(output);
+
+        int width = 0, height = 0;
+        while (matcher.find()) {
+            width = Integer.parseInt(matcher.group(1));
+            height = Integer.parseInt(matcher.group(2));
+            // 防止匹配到像素比等无关数字，只取合理范围
+            if (width >= 100 && height >= 100) {
+                break;
+            }
+        }
+
+        return new int[]{width, height};
     }
 }

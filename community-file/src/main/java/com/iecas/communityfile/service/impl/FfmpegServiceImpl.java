@@ -8,6 +8,9 @@
 package com.iecas.communityfile.service.impl;
 
 
+import com.iecas.communitycommon.utils.FileUtils;
+import com.iecas.communitycommon.utils.VideoUtils;
+import com.iecas.communityfile.pojo.middleEntity.TranscodeResolutionDataAndStatus;
 import com.iecas.communityfile.service.FfmpegService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,19 +34,19 @@ public class FfmpegServiceImpl implements FfmpegService {
 
 
     @Override
-    public boolean transcodeToHls(String inputPath) throws IOException, InterruptedException {
+    public TranscodeResolutionDataAndStatus transcodeToHls(String inputPath) throws IOException, InterruptedException {
         return transcodeToHls(defaultFfmpegPath, inputPath);
     }
 
 
     @Override
-    public boolean transcodeToHls(String ffmpegPath, String inputPath) throws IOException, InterruptedException{
-        return transcodeToHls(ffmpegPath, inputPath, defaultOutputPath);
+    public TranscodeResolutionDataAndStatus transcodeToHls(String inputPath, String outputPath) throws IOException, InterruptedException{
+        return transcodeToHls(defaultFfmpegPath, inputPath, outputPath);
     }
 
 
     @Override
-    public boolean transcodeToHls(String ffmpegPath, String inputPath, String outputDir) throws IOException, InterruptedException {
+    public TranscodeResolutionDataAndStatus transcodeToHls(String ffmpegPath, String inputPath, String outputDir) throws IOException, InterruptedException {
 
         // 设置默认路径
         if (ffmpegPath == null || ffmpegPath.isEmpty()){
@@ -58,6 +61,18 @@ public class FfmpegServiceImpl implements FfmpegService {
         if (!output.exists()) {
             output.mkdirs();
         }
+
+        // 根据输入路径获取视频文件的uuid
+        String[] split = inputPath.split("/");
+        String fileUUID = split[split.length - 1].split("\\.")[0];
+
+        // 获取输入视频的分辨率
+        int[] videoResolution = VideoUtils.getVideoResolution(defaultFfmpegPath, inputPath);
+        int height = videoResolution[0];
+
+        // 输出结果
+        TranscodeResolutionDataAndStatus result = new TranscodeResolutionDataAndStatus();
+        result.setMaster(FileUtils.pathJoin("/", fileUUID, "master.m3u8"));
 
         List<String> command = new ArrayList<>();
 
@@ -74,60 +89,80 @@ public class FfmpegServiceImpl implements FfmpegService {
         command.add("0");
 
         // 360p
-        command.add("-map");
-        command.add("0:v:0");
-        command.add("-map");
-        command.add("0:a:0");
-        command.add("-s:v:0");
-        command.add("640x360");
-        command.add("-b:v:0");
-        command.add("800k");
-        command.add("-c:v:0");
-        command.add("libx264");
-        command.add("-c:a:0");
-        command.add("aac");
+        if (height >= 360) {
+            command.add("-map");
+            command.add("0:v:0");
+            command.add("-map");
+            command.add("0:a:0");
+            command.add("-s:v:0");
+            command.add("640x360");
+            command.add("-b:v:0");
+            command.add("800k");
+            command.add("-c:v:0");
+            command.add("libx264");
+            command.add("-c:a:0");
+            command.add("aac");
+
+            // 添加转码后的信息
+            result.set_360p(FileUtils.pathJoin("/", fileUUID, "v0", "index.m3u8"));
+        }
 
         // 480p
-        command.add("-map");
-        command.add("0:v:0");
-        command.add("-map");
-        command.add("0:a:0");
-        command.add("-s:v:1");
-        command.add("854x480");
-        command.add("-b:v:1");
-        command.add("1400k");
-        command.add("-c:v:1");
-        command.add("libx264");
-        command.add("-c:a:1");
-        command.add("aac");
+        if (height >= 480) {
+            command.add("-map");
+            command.add("0:v:0");
+            command.add("-map");
+            command.add("0:a:0");
+            command.add("-s:v:1");
+            command.add("854x480");
+            command.add("-b:v:1");
+            command.add("1400k");
+            command.add("-c:v:1");
+            command.add("libx264");
+            command.add("-c:a:1");
+            command.add("aac");
+
+            // 添加转码后的信息
+            result.set_480p(FileUtils.pathJoin("/", fileUUID, "v1", "index.m3u8"));
+        }
 
         // 720p
-        command.add("-map");
-        command.add("0:v:0");
-        command.add("-map");
-        command.add("0:a:0");
-        command.add("-s:v:2");
-        command.add("1280x720");
-        command.add("-b:v:2");
-        command.add("2800k");
-        command.add("-c:v:2");
-        command.add("libx264");
-        command.add("-c:a:2");
-        command.add("aac");
+        if (height >= 720) {
+            command.add("-map");
+            command.add("0:v:0");
+            command.add("-map");
+            command.add("0:a:0");
+            command.add("-s:v:2");
+            command.add("1280x720");
+            command.add("-b:v:2");
+            command.add("2800k");
+            command.add("-c:v:2");
+            command.add("libx264");
+            command.add("-c:a:2");
+            command.add("aac");
+
+            // 添加转码后的信息
+            result.set_720p(FileUtils.pathJoin("/", fileUUID, "v2", "index.m3u8"));
+        }
 
         // 1080p
-        command.add("-map");
-        command.add("0:v:0");
-        command.add("-map");
-        command.add("0:a:0");
-        command.add("-s:v:3");
-        command.add("1920x1080");
-        command.add("-b:v:3");
-        command.add("5000k");
-        command.add("-c:v:3");
-        command.add("libx264");
-        command.add("-c:a:3");
-        command.add("aac");
+        if (height >= 1080) {
+            command.add("-map");
+            command.add("0:v:0");
+            command.add("-map");
+            command.add("0:a:0");
+            command.add("-s:v:3");
+            command.add("1920x1080");
+            command.add("-b:v:3");
+            command.add("5000k");
+            command.add("-c:v:3");
+            command.add("libx264");
+            command.add("-c:a:3");
+            command.add("aac");
+
+            // 添加转码后的信息
+            result.set_1080p(FileUtils.pathJoin("/", fileUUID, "v3", "index.m3u8"));
+        }
 
         // HLS 输出
         command.add("-f");
@@ -154,13 +189,8 @@ public class FfmpegServiceImpl implements FfmpegService {
             throw new RuntimeException("FFmpeg 转码失败，退出码: " + exitCode);
         }
         else {
-            return true;
+            result.setOk(true);
+            return result;
         }
-    }
-
-
-    @Override
-    public void asyncTranscodeToHls(String ffmpegPath, String inputPath, String outputPath) {
-
     }
 }

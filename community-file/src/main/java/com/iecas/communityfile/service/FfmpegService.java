@@ -1,5 +1,7 @@
 package com.iecas.communityfile.service;
 
+import com.iecas.communityfile.pojo.middleEntity.TranscodeResolutionDataAndStatus;
+
 import java.io.IOException;
 
 public interface FfmpegService {
@@ -11,17 +13,17 @@ public interface FfmpegService {
      * @param inputPath 输入视频文件路径，如 "/videos/input.mp4"
      * @param outputDir 输出目录路径，如 "/videos/output/"
      */
-    boolean transcodeToHls(String ffmpegPath, String inputPath, String outputDir) throws IOException, InterruptedException;
+    TranscodeResolutionDataAndStatus transcodeToHls(String ffmpegPath, String inputPath, String outputDir) throws IOException, InterruptedException;
 
 
     /**
      * 视频转码
-     * @param ffmpegPath ffmpeg路径
+     * @param outputPath 输出路径
      * @param inputPath 输入路径
      * @throws IOException
      * @throws InterruptedException
      */
-    boolean transcodeToHls(String ffmpegPath, String inputPath) throws IOException, InterruptedException;
+    TranscodeResolutionDataAndStatus transcodeToHls(String inputPath, String outputPath) throws IOException, InterruptedException;
 
 
     /**
@@ -30,14 +32,5 @@ public interface FfmpegService {
      * @throws IOException
      * @throws InterruptedException
      */
-    boolean transcodeToHls(String inputPath) throws IOException, InterruptedException;
-
-
-    /**
-     * 异步视频转码
-     * @param ffmpegPath 转码程序路径
-     * @param inputPath 输入路径
-     * @param outputPath 输出路径
-     */
-    void asyncTranscodeToHls(String ffmpegPath, String inputPath, String outputPath);
+    TranscodeResolutionDataAndStatus transcodeToHls(String inputPath) throws IOException, InterruptedException;
 }

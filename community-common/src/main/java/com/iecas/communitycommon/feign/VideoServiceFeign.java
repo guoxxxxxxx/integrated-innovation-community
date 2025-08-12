@@ -9,6 +9,7 @@ import com.iecas.communitycommon.model.video.entity.TranscodeInfo;
 import com.iecas.communitycommon.model.video.entity.VideoInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -23,6 +24,15 @@ public interface VideoServiceFeign {
      */
     @PostMapping("/video/video/save")
     CommonResult save(@RequestBody VideoInfo videoInfo);
+
+
+    /**
+     * 根据id更新视频元数据信息
+     * @param videoInfo 要更新的信息
+     * @return 更新状态 Boolean
+     */
+    @PutMapping("/video/video")
+    CommonResult updateVideoInfoById(@RequestBody VideoInfo videoInfo);
 
 
     /**

@@ -26,6 +26,7 @@ import com.iecas.communityfile.pojo.dto.CoverUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadMultiBlockDTO;
 import com.iecas.communityfile.pojo.dto.FileUploadPreHandleDTO;
+import com.iecas.communityfile.pojo.middleEntity.TranscodeResolutionDataAndStatus;
 import com.iecas.communityfile.pojo.middleEntity.UploadOtherInfo;
 import com.iecas.communityfile.pojo.vo.CheckFileUploadIsOkVO;
 import com.iecas.communityfile.pojo.vo.FileUploadPreHandleVO;
@@ -262,7 +263,8 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
         vo.setOtherInfo(dto.getOtherInfo());
 
         // 申请文件所需存储空间
-        String savePath = FileUtils.applyingDiskSpace(DEFAULT_SAVE_PATH, vo.getFileUUID(), dto.getFileSize());
+        FileUtils.mkdir(FileUtils.pathJoin(DEFAULT_SAVE_PATH, "originVideos/"));
+        String savePath = FileUtils.applyingDiskSpace(FileUtils.pathJoin(DEFAULT_SAVE_PATH, "originVideos/"), vo.getFileUUID(), dto.getFileSize());
         vo.setSavePath(savePath);
 
         // 将生成的中间信息存入至redis中
@@ -323,9 +325,8 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
             UserInfo currentUser = UserThreadLocal.getUserInfo();
 
             // 判断任务类型
-            // 1. 视频任务逻辑 TODO 此处测试固定设置为真
-            if (otherInfo.getTaskType().equalsIgnoreCase("VIDEO") || true){
-                // TODO 此处需要根据视频文件路径计算视频的时长
+            // 1. 视频任务逻辑
+            if (otherInfo.getTaskType().equalsIgnoreCase("VIDEO")){
                 double videoDurationSeconds = VideoUtils.getVideoDurationSeconds(cacheEntity.getSavePath());
                 // 保存其他元信息至视频数据库
                 CommonResult saveVideoResult = videoServiceFeign.save(
@@ -347,7 +348,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
                 TranscodeInfo transcodeInfo = TranscodeInfo.builder()
                         .vid(videoId)
                         .createTime(new Date())
-                        .transcodePath(DEFAULT_OUTPUT_PATH)
+                        .transcodePath(FileUtils.pathJoin(DEFAULT_OUTPUT_PATH, fileUUID))
                         .status(TranscodeStatusEnum.PENDING.getSTATUS())
                         .build();
                 CommonResult saveTranscodeInfoCommonResult = videoServiceFeign.saveTranscodeInfo(transcodeInfo);
@@ -363,11 +364,16 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
                         RequestContextHolder.setRequestAttributes(customRequestAttributes);
                         transcodeInfo.setStatus(TranscodeStatusEnum.RUNNING.getSTATUS());
                         videoServiceFeign.transcodeInfoUpdate(transcodeInfo);
-                        boolean result = ffmpegService.transcodeToHls(cacheEntity.getSavePath());
-                        if (result){
+                        TranscodeResolutionDataAndStatus result = ffmpegService.transcodeToHls(cacheEntity.getSavePath(), FileUtils.pathJoin(DEFAULT_OUTPUT_PATH, fileUUID));
+                        if (result.isOk()){
                             // 转码成功后更新转码任务状态信息
                             transcodeInfo.setAchievedTime(new Date());
                             transcodeInfo.setStatus(TranscodeStatusEnum.SUCCESS.getSTATUS());
+                            // 更新视频信息中的多分辨率播放路径
+                            VideoInfo willUpdate = new VideoInfo();
+                            willUpdate.setId(videoId);
+                            willUpdate.setResolution(JSON.toJSONString(result));
+                            videoServiceFeign.updateVideoInfoById(willUpdate);
                             videoServiceFeign.transcodeInfoUpdate(transcodeInfo);
                         }
                         else {
@@ -449,7 +455,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
         }
         if (!currentMd5.isEmpty() && dto.getMd5().equals(currentMd5)){
             // 对文件进行保存
-            boolean status = FileUtils.saveFile(FileUtils.pathJoin(DEFAULT_SAVE_PATH, uuid + "." + type),
+            boolean status = FileUtils.saveFile(FileUtils.pathJoin(DEFAULT_SAVE_PATH, "images", uuid + "." + type),
                     dto.getFile().getInputStream());
             if (status){
                 baseMapper.insert(currentFileInfo);
@@ -458,7 +464,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
                 uploadRecord.setStatus(UploadEnum.SUCCESS.getValue());
                 uploadRecord.setUploadAchieveTime(new Date());
                 uploadRecordService.updateById(uploadRecord);
-                return FileUtils.pathJoin(DEFAULT_SAVE_PATH, uuid + "." + type);
+                return FileUtils.pathJoin(DEFAULT_SAVE_PATH, "images", uuid + "." + type);
             }
             else {
                 // 更新上传状态信息为失败
