@@ -16,5 +16,6 @@
         <module>community-user-service</module>
         <module>community-video</module>
         <module>community-file</module>
+        <module>community-comment</module>
     </modules>
 </project>
