@@ -4,7 +4,10 @@ package com.iecas.communitycommon.model.comment.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -18,6 +21,9 @@ import java.util.Date;
  */
 @TableName("tb_video_comment_reply")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class VideoCommentReplyInfo implements Serializable {
 
     @Serial

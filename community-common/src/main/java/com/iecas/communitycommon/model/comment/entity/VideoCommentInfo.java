@@ -2,12 +2,17 @@ package com.iecas.communitycommon.model.comment.entity;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * (VideoComment)表实体类
@@ -17,6 +22,9 @@ import java.io.Serializable;
  */
 @TableName("tb_video_comment")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class VideoCommentInfo implements Serializable {
 
     @Serial
@@ -29,14 +37,9 @@ public class VideoCommentInfo implements Serializable {
     private Long id;
     
     /**
-     * 回复的父id, 若不存在则为null
+     * 评论对应的视频id
      */
-    private Long parentId;
-    
-    /**
-     * 用户地址
-     */
-    private String address;
+    private Long vid;
     
     /**
      * 评论内容
@@ -72,6 +75,11 @@ public class VideoCommentInfo implements Serializable {
      * ip归属地
      */
     private String ipCity;
-    
+
+    /**
+     * 回复消息
+     */
+    @TableField(exist = false)
+    private List<VideoCommentReplyInfo> reply;
 }
 

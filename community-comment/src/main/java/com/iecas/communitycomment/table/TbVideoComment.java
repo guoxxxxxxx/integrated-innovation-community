@@ -39,10 +39,6 @@ public class TbVideoComment {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Comment("用户地址")
-    @Column(name = "address")
-    private String address;
-
     @Comment("点赞数量")
     @Column(name = "likes")
     private Long likes;
@@ -54,4 +50,8 @@ public class TbVideoComment {
     @Comment("删除位")
     @Column(name = "deleted")
     private Boolean deleted;
+
+    @Comment("评论所属视频id")
+    @Column(name = "vid", nullable = false)
+    private Long vid;
 }
