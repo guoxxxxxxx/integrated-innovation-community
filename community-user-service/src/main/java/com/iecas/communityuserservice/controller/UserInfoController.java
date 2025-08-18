@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * (UserInfo)表控制层
@@ -55,5 +58,31 @@ public class UserInfoController{
         UserInfo userInfo = userInfoService.queryUserInfoByEmail(email);
         return new CommonResult().success().data(userInfo).message("查询成功");
     }
+
+
+    @Logger("通过用户id查询用户详细信息")
+    @GetMapping("/{id}")
+    public CommonResult queryUserInfoById(@PathVariable(name = "id") Long id){
+        UserInfo userInfo = userInfoService.getById(id);
+        return new CommonResult().data(userInfo).success();
+    }
+
+
+    @Logger("通过用户id列表同时查询多个用户的信息")
+    @GetMapping("/queryUserInfoByIds")
+    public CommonResult queryUserInfoByIds(@RequestParam List<Long> ids){
+        List<UserInfo> userInfoList = userInfoService.queryUserInfoByIds(ids);
+        return new CommonResult().data(userInfoList).success();
+    }
+
+
+    @Logger("通过用户id列表同时查询多个用户的实体信息并映射为Map")
+    @GetMapping("queryUserInfoByIds2Map")
+    public CommonResult queryUserInfoByIds2Map(@RequestParam List<Long> ids){
+        Map<Long, UserInfo> userInfoList = userInfoService.queryUserInfoByIds2Map(ids);
+        return new CommonResult().data(userInfoList).success();
+    }
+
+
 }
 

@@ -20,9 +20,4 @@ public class VideoReplyDTO {
      * 所属评论父id
      */
     private Long parentId;
-
-    /**
-     * 所属主评论id
-     */
-    private Long videoCommentId;
 }

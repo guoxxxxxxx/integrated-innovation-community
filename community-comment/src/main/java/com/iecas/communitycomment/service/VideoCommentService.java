@@ -3,6 +3,7 @@ package com.iecas.communitycomment.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.iecas.communitycomment.pojo.params.QueryCommentParams;
 import com.iecas.communitycomment.pojo.params.VideoCommentDTO;
+import com.iecas.communitycomment.pojo.vo.VideoCommentVO;
 import com.iecas.communitycommon.common.PageResult;
 import com.iecas.communitycommon.model.comment.entity.VideoCommentInfo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public interface VideoCommentService extends IService<VideoCommentInfo> {
      * @param params 查询参数
      * @return 查询结果
      */
-    PageResult<VideoCommentInfo> getVideoCommentById(QueryCommentParams params);
+    PageResult<VideoCommentVO> getVideoCommentById(QueryCommentParams params);
 
 
     /**
@@ -29,5 +30,5 @@ public interface VideoCommentService extends IService<VideoCommentInfo> {
      * @param dto 参数信息
      * @return 是否成功
      */
-    boolean saveOneVideComment(VideoCommentDTO dto, HttpServletRequest request);
+    VideoCommentInfo saveOneVideComment(VideoCommentDTO dto, HttpServletRequest request);
 }

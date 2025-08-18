@@ -50,4 +50,17 @@ public class PageResult<T> {
         this.pageSize = page.getSize();
         this.data = page.getRecords();
     }
+
+
+    /**
+     * vo
+     * @param data
+     */
+    public PageResult(List<T> data, long total, long currentPage, long pageSize){
+
+        this.total = total;
+        this.currentPage = currentPage;
+        this.pageSize = pageSize;
+        this.data = data;
+    }
 }

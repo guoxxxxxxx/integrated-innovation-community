@@ -31,10 +31,6 @@ public class TbVideoCommentReply {
     @Column(name = "ip_city")
     private String ipCity;
 
-    @Comment("所属最顶级父评论id")
-    @Column(name = "video_comment_id")
-    private Long videoCommentId;
-
     @Comment("所属父评论id")
     @Column(name = "parent_id")
     private Long parentId;
@@ -52,11 +48,11 @@ public class TbVideoCommentReply {
     private Long uid;
 
     @Comment("删除位")
-    @Column(name = "deleted")
+    @Column(name = "deleted", columnDefinition = "TINYINT DEFAULT 0")
     private Boolean deleted;
 
     @Comment("点赞数")
-    @Column(name = "likes")
+    @Column(name = "likes", columnDefinition = "INT8 DEFAULT 0")
     private Long likes;
 
 }

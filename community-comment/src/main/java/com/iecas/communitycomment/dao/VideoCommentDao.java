@@ -1,6 +1,8 @@
 package com.iecas.communitycomment.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.iecas.communitycomment.pojo.vo.VideoCommentVO;
 import com.iecas.communitycommon.model.comment.entity.VideoCommentInfo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,4 +14,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface VideoCommentDao extends BaseMapper<VideoCommentInfo> {
+
 }

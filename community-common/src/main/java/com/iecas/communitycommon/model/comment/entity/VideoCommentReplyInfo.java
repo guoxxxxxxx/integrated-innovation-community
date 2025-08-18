@@ -43,7 +43,7 @@ public class VideoCommentReplyInfo implements Serializable {
     /**
      * 回复时间
      */
-    private Long createTime;
+    private Date createTime;
     
     /**
      * 删除位
@@ -64,11 +64,6 @@ public class VideoCommentReplyInfo implements Serializable {
      * 用户
      */
     private Long uid;
-    
-    /**
-     * 所属最顶级父评论id
-     */
-    private Long videoCommentId;
     
     /**
      * ip地址

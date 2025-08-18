@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,6 +71,20 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoDao, UserInfo> impl
     public UserInfo queryUserInfoByEmail(String email) {
         return baseMapper.selectOne(new LambdaQueryWrapper<UserInfo>()
                 .eq(UserInfo::getEmail, email));
+    }
+
+
+    @Override
+    public List<UserInfo> queryUserInfoByIds(List<Long> ids) {
+        List<UserInfo> userInfoList = baseMapper.selectBatchIds(ids);
+        return userInfoList;
+    }
+
+
+    @Override
+    public Map<Long, UserInfo> queryUserInfoByIds2Map(List<Long> ids) {
+        Map<Long, UserInfo> userInfoMap = baseMapper.selectUserInfoByIds2Map(ids);
+        return userInfoMap;
     }
 }
 

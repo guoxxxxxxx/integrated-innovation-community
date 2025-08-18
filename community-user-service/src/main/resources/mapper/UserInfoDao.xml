@@ -22,6 +22,7 @@
             (#{entity.authUserId}#{entity.avatar}#{entity.birthday}#{entity.email}#{entity.gender}#{entity.nickname}#{entity.phone}#{entity.registerTime})
         </foreach>
     </insert>
+
     <!-- 批量插入或按主键更新 -->
     <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
         insert into db_community_user.tb_user_info(auth_user_idavatarbirthdayemailgendernicknamephoneregister_time)
@@ -33,6 +34,18 @@
         auth_user_id = values(auth_user_id) avatar = values(avatar) birthday = values(birthday) email = values(email)
         gender = values(gender) nickname = values(nickname) phone = values(phone) register_time = values(register_time)
     </insert>
+
+
+    <!--根据用户id批量查询用户信息，返回值为HashMap其中key为用户id，Value为用户实体信息-->
+    <select id="selectUserInfoByIds2Map" resultType="com.iecas.communitycommon.model.user.entity.UserInfo">
+        SELECT id, auth_user_id, avatar, birthday, email, gender,
+               nickname, phone, register_time
+        FROM db_community_user.tb_user_info
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 
 </mapper>
 

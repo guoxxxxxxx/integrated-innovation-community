@@ -2,6 +2,7 @@ package com.iecas.communitycomment.controller;
 
 import com.iecas.communitycomment.pojo.params.QueryCommentParams;
 import com.iecas.communitycomment.pojo.params.VideoCommentDTO;
+import com.iecas.communitycomment.pojo.vo.VideoCommentVO;
 import com.iecas.communitycomment.service.VideoCommentService;
 import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.aop.annotation.Logger;
@@ -30,7 +31,7 @@ public class VideoCommentController {
     @Logger("根据视频id查询对应的评论信息")
     @GetMapping("")
     public CommonResult getVideoCommentByVid(QueryCommentParams params) {
-        PageResult<VideoCommentInfo> pageResult = videoCommentService.getVideoCommentById(params);
+        PageResult<VideoCommentVO> pageResult = videoCommentService.getVideoCommentById(params);
         return new CommonResult().data(pageResult).success();
     }
 
@@ -39,7 +40,7 @@ public class VideoCommentController {
     @Logger("发送一条评论信息")
     @PostMapping("")
     public CommonResult saveOneVideComment(@RequestBody VideoCommentDTO dto, HttpServletRequest request){
-        boolean status = videoCommentService.saveOneVideComment(dto, request);
-        return new CommonResult().data(status).success();
+        VideoCommentInfo result = videoCommentService.saveOneVideComment(dto, request);
+        return new CommonResult().data(result).success();
     }
 }

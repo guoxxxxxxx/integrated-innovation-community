@@ -25,9 +25,9 @@ import java.util.List;
 public class VideoCommentReplyServiceImpl extends ServiceImpl<VideoCommentReplyDao, VideoCommentReplyInfo> implements VideoCommentReplyService {
 
     @Override
-    public List<VideoCommentReplyInfo> getVideoCommentReplyByVCid(Long vcid) {
+    public List<VideoCommentReplyInfo> getVideoCommentReplyByVCid(Long parentId) {
         List<VideoCommentReplyInfo> result = baseMapper.selectList(new LambdaQueryWrapper<VideoCommentReplyInfo>()
-                .eq(VideoCommentReplyInfo::getVideoCommentId, vcid)
+                .eq(VideoCommentReplyInfo::getParentId, parentId)
                 .orderBy(true, false, VideoCommentReplyInfo::getCreateTime));
         return result;
     }
@@ -44,11 +44,10 @@ public class VideoCommentReplyServiceImpl extends ServiceImpl<VideoCommentReplyD
         // 构建回复记录
         VideoCommentReplyInfo commentReplyInfo = VideoCommentReplyInfo.builder()
                 .content(dto.getContent())
-                .createTime(new Date().getTime())
+                .createTime(new Date())
                 .ipAddress(ip)
                 .parentId(dto.getParentId())
                 .uid(userInfo.getId())
-                .videoCommentId(dto.getVideoCommentId())
                 .build();
 
         int insert = baseMapper.insert(commentReplyInfo);

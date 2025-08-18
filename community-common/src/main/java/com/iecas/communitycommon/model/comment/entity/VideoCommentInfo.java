@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iecas.communitycommon.model.user.entity.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,7 +52,7 @@ public class VideoCommentInfo implements Serializable {
     /**
      * 创建时间
      */
-    private Long createTime;
+    private Date createTime;
     
     /**
      * 删除位
@@ -75,11 +78,5 @@ public class VideoCommentInfo implements Serializable {
      * ip归属地
      */
     private String ipCity;
-
-    /**
-     * 回复消息
-     */
-    @TableField(exist = false)
-    private List<VideoCommentReplyInfo> reply;
 }
 

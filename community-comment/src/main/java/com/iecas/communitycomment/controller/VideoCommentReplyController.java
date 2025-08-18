@@ -27,9 +27,9 @@ public class VideoCommentReplyController {
 
 
     @Logger("根据评论所属父id查询指定视频下的所有评论")
-    @GetMapping("/{vcid}")
-    public CommonResult getVideoCommentReplyByVCid(@PathVariable(name = "vcid") Long vcid){
-        List<VideoCommentReplyInfo> result = videoCommentReplyService.getVideoCommentReplyByVCid(vcid);
+    @GetMapping("/{parentId}")
+    public CommonResult getVideoCommentReplyByVCid(@PathVariable(name = "parentId") Long parentId){
+        List<VideoCommentReplyInfo> result = videoCommentReplyService.getVideoCommentReplyByVCid(parentId);
         return new CommonResult().data(result).success();
     }
 

@@ -40,7 +40,7 @@ public class TbVideoComment {
     private String content;
 
     @Comment("点赞数量")
-    @Column(name = "likes")
+    @Column(name = "likes", columnDefinition = "INT8 DEFAULT 0")
     private Long likes;
 
     @Comment("创建时间")
@@ -48,7 +48,7 @@ public class TbVideoComment {
     private Date createTime;
 
     @Comment("删除位")
-    @Column(name = "deleted")
+    @Column(name = "deleted", columnDefinition = "TINYINT DEFAULT 0")
     private Boolean deleted;
 
     @Comment("评论所属视频id")

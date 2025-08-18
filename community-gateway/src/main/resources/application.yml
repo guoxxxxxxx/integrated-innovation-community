@@ -47,6 +47,13 @@ spring:
             filters:
               - StripPrefix=3
 
+          - id: community-comment-service
+            uri: lb://community-comment-service
+            predicates:
+              - Path=${request_prefix}/comment/**
+            filters:
+              - StripPrefix=3
+
 server:
   port: 11000
 

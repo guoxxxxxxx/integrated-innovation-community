@@ -20,7 +20,7 @@ public class QueryCommentParams extends PageParams {
     /**
      * 是否按照时间排序
      */
-    private Boolean sortByDate;
+    private Boolean sortByDate = false;
 
     /**
      * 是否按照时间升序排序
@@ -30,7 +30,7 @@ public class QueryCommentParams extends PageParams {
     /**
      * 是否按照热度排序
      */
-    private Boolean sortByHot;
+    private Boolean sortByHot = false;
 
     /**
      * 是否按照热度升序排列

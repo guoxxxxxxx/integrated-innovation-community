@@ -9,10 +9,15 @@ package com.iecas.communitycommon.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iecas.communitycommon.common.CommonResult;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CommonResultUtils {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * 将CommonResult中的data解析成JSON字符串
@@ -33,5 +38,15 @@ public class CommonResultUtils {
      */
     public static <T> T parseCommonResult(CommonResult commonResult, Class<T> clazz) {
         return JSON.parseObject(commonResult.getJsonData(), clazz);
+    }
+
+
+    public static <T> T parseCommonResult(CommonResult commonResult, TypeReference<T> typeRef){
+        try{
+            return mapper.readValue(commonResult.getJsonData(), typeRef);
+        } catch (Exception e){
+            log.error("类型转化错误", e);
+            throw new RuntimeException(e);
+        }
     }
 }

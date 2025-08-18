@@ -17,10 +17,10 @@ public interface VideoCommentReplyService extends IService<VideoCommentReplyInfo
 
     /**
      * 根据父评论id查询所有所属的子评论
-     * @param vcid 父评论id
+     * @param parentId 父评论id
      * @return 查询结果
      */
-    List<VideoCommentReplyInfo> getVideoCommentReplyByVCid(Long vcid);
+    List<VideoCommentReplyInfo> getVideoCommentReplyByVCid(Long parentId);
 
 
     /**

@@ -3,6 +3,9 @@ package com.iecas.communityuserservice.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * (UserInfo)表服务接口
  *
@@ -25,5 +28,21 @@ public interface UserInfoService extends IService<UserInfo> {
      * @return 用户信息
      */
     UserInfo queryUserInfoByEmail(String email);
+
+
+    /**
+     * 根据用户id列表同时查询多个用户信息
+     * @param ids 用户id列表
+     * @return 用户信息列表
+     */
+    List<UserInfo> queryUserInfoByIds(List<Long> ids);
+
+
+    /**
+     * 根据用户id列表同时查询多个用户信息并将其映射为Map
+     * @param ids 用户信息列表
+     * @return 用户信息Map
+     */
+    Map<Long, UserInfo> queryUserInfoByIds2Map(List<Long> ids);
 }
 
