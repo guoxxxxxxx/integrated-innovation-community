@@ -1,10 +1,12 @@
 package com.iecas.communitycomment.controller;
 
+import com.iecas.communitycomment.pojo.middle.ReplyMiddleEntity;
 import com.iecas.communitycomment.pojo.params.VideoReplyDTO;
 import com.iecas.communitycomment.service.VideoCommentReplyService;
 import com.iecas.communitycommon.aop.annotation.Auth;
 import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.common.PageResult;
 import com.iecas.communitycommon.model.comment.entity.VideoCommentReplyInfo;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,4 +42,25 @@ public class VideoCommentReplyController {
         Boolean result = videoCommentReplyService.saveVideoReply(dto, request);
         return new CommonResult().data(result).success();
     }
+
+    @Logger("分页获取回复信息")
+    @GetMapping("/getPage/{parentId}/{pageNo}/{pageSize}")
+    public CommonResult getVideoCommentReplyPageByVCid(@PathVariable(name = "parentId") Long parentId,
+                                                       @PathVariable(name = "pageNo", required = false) Long pageNo,
+                                                       @PathVariable(name = "pageSize", required = false) Long pageSize){
+        PageResult<VideoCommentReplyInfo> result = videoCommentReplyService.getVideoCommentReplyPageByVCid(parentId,
+                pageNo, pageSize);
+        return new CommonResult().data(result).success();
+    }
+
+
+    @Logger("分页获取回复信息并封装成前端需要的格式")
+    @GetMapping("/getPageFormat/{parentId}/{pageNo}/{pageSize}")
+    public CommonResult getVideoCommentReplyPageFormatByVCid(@PathVariable(name = "parentId") Long parentId,
+                                                       @PathVariable(name = "pageNo", required = false) Long pageNo,
+                                                       @PathVariable(name = "pageSize", required = false) Long pageSize){
+        ReplyMiddleEntity e = videoCommentReplyService.getVideoCommentReplyPageFormatByVCid(parentId, pageNo, pageSize);
+        return new CommonResult().data(e).success();
+    }
+
 }

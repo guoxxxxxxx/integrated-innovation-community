@@ -1,7 +1,9 @@
 package com.iecas.communitycomment.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.iecas.communitycomment.pojo.middle.ReplyMiddleEntity;
 import com.iecas.communitycomment.pojo.params.VideoReplyDTO;
+import com.iecas.communitycommon.common.PageResult;
 import com.iecas.communitycommon.model.comment.entity.VideoCommentReplyInfo;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -29,4 +31,24 @@ public interface VideoCommentReplyService extends IService<VideoCommentReplyInfo
      * @return 状态
      */
     Boolean saveVideoReply(VideoReplyDTO dto,  HttpServletRequest request);
+
+
+    /**
+     * 分页获取回复信息
+     * @param parentId 父评论id
+     * @param pageNo 页码
+     * @param pageSize 页面大小
+     * @return 结果
+     */
+    PageResult<VideoCommentReplyInfo> getVideoCommentReplyPageByVCid(Long parentId, Long pageNo, Long pageSize);
+
+
+    /**
+     * 分页获取回复信息并转化为前端需要的格式
+     * @param parentId 父评论id
+     * @param pageNo 页码
+     * @param pageSize 页面大小
+     * @return 结果
+     */
+    ReplyMiddleEntity getVideoCommentReplyPageFormatByVCid(Long parentId, Long pageNo, Long pageSize);
 }
