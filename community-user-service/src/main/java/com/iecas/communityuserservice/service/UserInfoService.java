@@ -2,6 +2,7 @@ package com.iecas.communityuserservice.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communityuserservice.pojo.UserInfoDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -44,5 +45,13 @@ public interface UserInfoService extends IService<UserInfo> {
      * @return 用户信息Map
      */
     Map<Long, UserInfo> queryUserInfoByIds2Map(List<Long> ids);
+
+
+    /**
+     * 根据用户id更新用户信息
+     * @param dto 用户信息
+     * @return 更新后的用户信息
+     */
+    UserInfo updateUserInfoById(UserInfoDTO dto);
 }
 

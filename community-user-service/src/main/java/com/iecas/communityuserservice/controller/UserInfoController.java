@@ -6,6 +6,7 @@ import com.iecas.communitycommon.aop.annotation.Logger;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.feign.AuthServiceFeign;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communityuserservice.pojo.UserInfoDTO;
 import com.iecas.communityuserservice.service.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,15 @@ public class UserInfoController{
     public CommonResult queryUserInfoByIds2Map(@RequestParam List<Long> ids){
         Map<Long, UserInfo> userInfoList = userInfoService.queryUserInfoByIds2Map(ids);
         return new CommonResult().data(userInfoList).success();
+    }
+
+
+    @Auth
+    @Logger("修改用户个人信息")
+    @PostMapping("/update")
+    public CommonResult updateUserInfoById(@RequestBody UserInfoDTO dto){
+        UserInfo result = userInfoService.updateUserInfoById(dto);
+        return new CommonResult().data(result).success();
     }
 
 

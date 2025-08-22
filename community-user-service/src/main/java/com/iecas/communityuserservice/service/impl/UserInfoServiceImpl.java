@@ -5,14 +5,18 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.common.UserThreadLocal;
 import com.iecas.communitycommon.constant.RedisPrefix;
+import com.iecas.communitycommon.exception.AuthException;
 import com.iecas.communitycommon.exception.CommonException;
 import com.iecas.communitycommon.feign.AuthServiceFeign;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
 import com.iecas.communitycommon.utils.CommonResultUtils;
 import com.iecas.communitycommon.utils.RandomExpiredTime;
 import com.iecas.communityuserservice.dao.UserInfoDao;
+import com.iecas.communityuserservice.pojo.UserInfoDTO;
 import com.iecas.communityuserservice.service.UserInfoService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -85,6 +90,23 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoDao, UserInfo> impl
     public Map<Long, UserInfo> queryUserInfoByIds2Map(List<Long> ids) {
         Map<Long, UserInfo> userInfoMap = baseMapper.selectUserInfoByIds2Map(ids);
         return userInfoMap;
+    }
+
+
+    @Override
+    public UserInfo updateUserInfoById(UserInfoDTO dto) {
+        // 鉴权
+        UserInfo currentUserInfo = UserThreadLocal.getUserInfo();
+        if (!Objects.equals(dto.getId(), currentUserInfo.getId())){
+            throw new AuthException("无权限！");
+        }
+
+        UserInfo userInfo = new UserInfo();
+        BeanUtils.copyProperties(dto, userInfo);
+
+        baseMapper.updateById(userInfo);
+        userInfo = baseMapper.selectById(dto.getId());
+        return userInfo;
     }
 }
 
