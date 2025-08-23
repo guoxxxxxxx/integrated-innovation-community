@@ -87,9 +87,11 @@ public class VideoCommentServiceImpl extends ServiceImpl<VideoCommentDao, VideoC
         }
 
         // 根据用户id查询用户的详细信息
-        CommonResult commonResult = userServiceFeign.queryUserInfoByIds2Map(userIds);
-        userInfoMap.putAll(CommonResultUtils.parseCommonResult(commonResult, new TypeReference<>() {}));
-
+        if (!userIds.isEmpty()) {
+            CommonResult commonResult = userServiceFeign.queryUserInfoByIds2Map(userIds);
+            userInfoMap.putAll(CommonResultUtils.parseCommonResult(commonResult, new TypeReference<>() {
+            }));
+        }
         return new PageResult<>(result, pageResult.getTotal(), pageResult.getCurrent(), pageResult.getSize());
     }
 

@@ -22,5 +22,13 @@ public interface VideoInfoService extends IService<VideoInfo> {
      * @return 结果
      */
     PageResult<VideoInfo> getPage(QueryCondition condition);
+
+
+    /**
+     * 根据id查询视频信息，并将播放数量+1
+     * @param id 视频id
+     * @return 更改后的信息
+     */
+    VideoInfo queryVideoInfoById(Long id);
 }
 

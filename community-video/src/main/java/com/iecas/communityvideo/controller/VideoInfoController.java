@@ -64,7 +64,7 @@ public class VideoInfoController {
     @Logger("根据id查询视频详细信息")
     @GetMapping("/{id}")
     public CommonResult queryVideoInfoById(@PathVariable(name = "id") Long id){
-        VideoInfo videoInfo = videoInfoService.getById(id);
+        VideoInfo videoInfo = videoInfoService.queryVideoInfoById(id);
         return new CommonResult().data(videoInfo).success();
     }
 

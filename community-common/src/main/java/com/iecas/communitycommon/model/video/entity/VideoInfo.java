@@ -2,8 +2,14 @@ package com.iecas.communitycommon.model.video.entity;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iecas.communitycommon.common.CommonResult;
+import com.iecas.communitycommon.feign.UserServiceFeign;
+import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communitycommon.utils.CommonResultUtils;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -97,6 +103,27 @@ public class VideoInfo implements Serializable {
     private String resolution;
 
     /**
+     * 视频所属类别id
+     */
+    private Long categoryId;
+
+    /**
+     * 点赞数
+     */
+    private Long likes;
+
+    /**
+     * 收藏数
+     */
+    private Long favorite;
+
+    /**
+     * 视频用户信息
+     */
+    @TableField(exist = false)
+    private UserInfo user;
+
+    /**
      * 获取视频封面图片
      */
     @JsonProperty("coverName")
@@ -108,5 +135,12 @@ public class VideoInfo implements Serializable {
         return split[split.length - 1];
     }
 
+
+    /**
+     * 视频播放数量+1
+     */
+    public void viewCountIncrement(){
+        this.viewCount++;
+    }
 }
 

@@ -72,4 +72,16 @@ public class TbVideoInfo {
     @Comment("视频分辨率及播放路径, 采用JSON格式进行存储")
     @Column(name = "resolution", columnDefinition = "TEXT")
     private String resolution;
+
+    @Comment("视频所属类别id")
+    @Column(name = "category_id")
+    private Long categoryId;
+
+    @Comment("点赞数")
+    @Column(name = "likes", columnDefinition = "INT8 DEFAULT 0")
+    private Long likes;
+
+    @Comment("收藏数")
+    @Column(name = "favorite", columnDefinition = "INT8 DEFAULT 0")
+    private Long favorite;
 }
