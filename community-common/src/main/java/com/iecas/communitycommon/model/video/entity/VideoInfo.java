@@ -11,15 +11,13 @@ import com.iecas.communitycommon.feign.UserServiceFeign;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
 import com.iecas.communitycommon.utils.CommonResultUtils;
 import jakarta.persistence.Column;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * (VideoInfo)表实体类
@@ -31,6 +29,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = "categoryName")
 public class VideoInfo implements Serializable {
 
     @Serial
@@ -108,6 +107,12 @@ public class VideoInfo implements Serializable {
     private Long categoryId;
 
     /**
+     * 视频所属类别名称
+     */
+    @TableField(exist = false)
+    private String categoryName;
+
+    /**
      * 点赞数
      */
     private Long likes;
@@ -141,6 +146,27 @@ public class VideoInfo implements Serializable {
      */
     public void viewCountIncrement(){
         this.viewCount++;
+    }
+
+
+    /**
+     * 视频类别映射表
+     */
+    @JsonIgnore
+    @TableField(exist = false)
+    private HashMap<Long, VideoCategoryInfo> categoryMapping;
+
+
+    /**
+     * 获取类别名称
+     */
+    public String getCategoryName(){
+        if (categoryMapping == null || categoryMapping.isEmpty()){
+            return this.categoryName;
+        }
+        else {
+            return categoryMapping.get(this.categoryId).getCategory();
+        }
     }
 }
 

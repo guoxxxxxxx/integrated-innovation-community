@@ -87,7 +87,7 @@ public class AuthAspect {
 
         if (!StringUtils.hasLength(token)){
             // 不存在token时告知前端跳转到登陆界面
-            throw new AuthException("Header中不存在token", HttpStatusEnum.AUTH_JUMP_LOGIN.getStatusCode());
+            throw new AuthException("token不存在", HttpStatusEnum.AUTH_JUMP_LOGIN.getStatusCode());
         }
 
         // 解析token

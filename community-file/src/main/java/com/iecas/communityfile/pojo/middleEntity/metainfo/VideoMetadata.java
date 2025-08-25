@@ -32,4 +32,9 @@ public class VideoMetadata {
      * 封面图片路径
      */
     private String coverUrl;
+
+    /**
+     * 类别id
+     */
+    private Long categoryId;
 }

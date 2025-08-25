@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.Comment;
 
 /**
@@ -12,7 +13,7 @@ import org.hibernate.annotations.Comment;
  * @File: TbVideoUserLikesFavor
  * @Description: 视频点赞收藏与用户的关系表
  */
-@TableName("tb_video_user_likes_favor")
+@Table(name = "tb_video_user_likes_favor")
 @Entity
 public class TbVideoUserLikesFavor {
 

@@ -8,10 +8,12 @@ import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.common.PageResult;
 import com.iecas.communitycommon.feign.UserServiceFeign;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
+import com.iecas.communitycommon.model.video.entity.VideoCategoryInfo;
 import com.iecas.communitycommon.utils.CommonResultUtils;
 import com.iecas.communityvideo.dao.VideoInfoDao;
 import com.iecas.communitycommon.model.video.entity.VideoInfo;
 import com.iecas.communityvideo.pojo.Params.QueryCondition;
+import com.iecas.communityvideo.service.VideoCategoryService;
 import com.iecas.communityvideo.service.VideoInfoService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,9 @@ public class VideoInfoServiceImpl extends ServiceImpl<VideoInfoDao, VideoInfo> i
     @Resource
     private UserServiceFeign userServiceFeign;
 
+    @Resource
+    VideoCategoryService videoCategoryService;
+
     @Override
     public PageResult<VideoInfo> getPage(QueryCondition condition) {
 
@@ -47,10 +52,14 @@ public class VideoInfoServiceImpl extends ServiceImpl<VideoInfoDao, VideoInfo> i
                 .ge(condition.getStartUploadTime() != null, VideoInfo::getUploadTime, condition.getStartUploadTime())
                 .le(condition.getEndUploadTime() != null, VideoInfo::getUploadTime, condition.getEndUploadTime()));
 
+        // 查询视频对应的类别信息的映射
+        HashMap<Long, VideoCategoryInfo> videoCategoryMapping = videoCategoryService.getVideoCategoryMapping();
+
         // 查询每个视频对应的用户的详细信息
         List<Long> allUserId = new ArrayList<>();
         for(VideoInfo e : pageResult.getRecords()){
             allUserId.add(e.getUserId());
+            e.setCategoryMapping(videoCategoryMapping);
         }
         // 查询
         CommonResult commonResult = userServiceFeign.queryUserInfoByIds2Map(allUserId);
@@ -73,6 +82,10 @@ public class VideoInfoServiceImpl extends ServiceImpl<VideoInfoDao, VideoInfo> i
         CommonResult commonResult = userServiceFeign.queryUserInfoById(videoInfo.getUserId());
         UserInfo userInfo = CommonResultUtils.parseCommonResult(commonResult, UserInfo.class);
         videoInfo.setUser(userInfo);
+
+        // 查询当前视频对象的类别名称
+        VideoCategoryInfo categoryName = videoCategoryService.getById(videoInfo.getCategoryId());
+        videoInfo.setCategoryName(categoryName.getCategory());
         return videoInfo;
     }
 }

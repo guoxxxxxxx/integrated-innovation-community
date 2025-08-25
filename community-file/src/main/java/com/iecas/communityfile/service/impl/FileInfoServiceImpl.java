@@ -340,6 +340,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
                                 .userId(currentUser.getId())
                                 .coverUrl(otherInfo.getVideoMetadata().getCoverUrl())
                                 .duration(videoDurationSeconds)
+                                .categoryId(otherInfo.getVideoMetadata().getCategoryId())
                                 .build()
                 );
                 Long videoId = CommonResultUtils.parseCommonResult(saveVideoResult, Long.class);
