@@ -2,7 +2,11 @@ package com.iecas.communitycommon.model.user.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import jakarta.persistence.Table;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @Time: 2025/8/22 21:04
@@ -10,7 +14,11 @@ import jakarta.persistence.Table;
  * @File: UserFollowInfo
  * @Description:
  */
-@Table(name = "tb_user_follow")
+@TableName("tb_user_follow")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserFollowInfo {
 
     /**
