@@ -42,7 +42,6 @@ public class VideoInfoServiceImpl extends ServiceImpl<VideoInfoDao, VideoInfo> i
 
     @Override
     public PageResult<VideoInfo> getPage(QueryCondition condition) {
-
         Page<VideoInfo> pageCondition = new Page<>(condition.getPageNo(), condition.getPageSize());
         Page<VideoInfo> pageResult = baseMapper.selectPage(pageCondition, new LambdaQueryWrapper<VideoInfo>()
                 .eq(condition.getClazz() != null, VideoInfo::getClass, condition.getClazz())
@@ -50,7 +49,8 @@ public class VideoInfoServiceImpl extends ServiceImpl<VideoInfoDao, VideoInfo> i
                 .orderBy(condition.isSortByUploadTime(), !condition.isSortByUploadTimeDesc(), VideoInfo::getUploadTime)
                 .eq(condition.getUid() != null, VideoInfo::getUserId, condition.getUid())
                 .ge(condition.getStartUploadTime() != null, VideoInfo::getUploadTime, condition.getStartUploadTime())
-                .le(condition.getEndUploadTime() != null, VideoInfo::getUploadTime, condition.getEndUploadTime()));
+                .le(condition.getEndUploadTime() != null, VideoInfo::getUploadTime, condition.getEndUploadTime())
+                .eq(condition.getCategoryId() != null && condition.getCategoryId() != 0, VideoInfo::getCategoryId, condition.getCategoryId()));
 
         // 查询视频对应的类别信息的映射
         HashMap<Long, VideoCategoryInfo> videoCategoryMapping = videoCategoryService.getVideoCategoryMapping();

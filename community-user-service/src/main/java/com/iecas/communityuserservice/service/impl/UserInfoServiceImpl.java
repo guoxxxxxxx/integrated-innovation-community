@@ -88,6 +88,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoDao, UserInfo> impl
 
     @Override
     public Map<Long, UserInfo> queryUserInfoByIds2Map(List<Long> ids) {
+        if (ids == null || ids.size() == 0){
+            return new HashMap<>();
+        }
         Map<Long, UserInfo> userInfoMap = baseMapper.selectUserInfoByIds2Map(ids);
         return userInfoMap;
     }

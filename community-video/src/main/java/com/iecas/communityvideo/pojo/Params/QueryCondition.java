@@ -58,4 +58,9 @@ public class QueryCondition {
      * 是否根据上传时间降序排序
      */
     private boolean sortByUploadTimeDesc = false;
+
+    /**
+     * 根据类别查询
+     */
+    private Long categoryId;
 }
