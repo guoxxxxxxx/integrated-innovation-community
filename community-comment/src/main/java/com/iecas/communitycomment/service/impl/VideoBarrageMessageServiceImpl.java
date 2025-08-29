@@ -1,5 +1,7 @@
 package com.iecas.communitycomment.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.iecas.communitycomment.config.RabbitMQVideoBarrageConfig;
 import com.iecas.communitycomment.dao.VideoBarrageMessageRepository;
 import com.iecas.communitycomment.pojo.params.QueryVideoBarrageParams;
 import com.iecas.communitycomment.pojo.params.VideoBarrageDTO;
@@ -10,6 +12,7 @@ import com.iecas.communitycomment.table.MGVideoBarrageMessage;
 import com.iecas.communitycommon.common.UserThreadLocal;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
 import jakarta.annotation.Resource;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,9 @@ public class VideoBarrageMessageServiceImpl implements VideoBarrageMessageServic
 
     @Resource
     VideoBarrageMessageRepository videoBarrageMessageRepository;
+
+    @Resource
+    RabbitTemplate rabbitTemplate;
 
 
     @Override
@@ -54,7 +60,9 @@ public class VideoBarrageMessageServiceImpl implements VideoBarrageMessageServic
                 .videoPlayProgress(dto.getVideoPlayProgress())
                 .createTime(new Date())
                 .build();
-        videoBarrageMessageRepository.save(barrageMessage);
+        rabbitTemplate.convertAndSend(RabbitMQVideoBarrageConfig.BARRAGE_EXCHANGE, RabbitMQVideoBarrageConfig.BARRAGE_ROUTING_KEY,
+                JSON.toJSONString(barrageMessage));
+        // videoBarrageMessageRepository.save(barrageMessage);
         return barrageMessage;
     }
 
