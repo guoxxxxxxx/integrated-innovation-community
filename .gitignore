@@ -34,6 +34,8 @@ build/
 
 # docker中的数据文件
 docker/data
+docker/mongo
+docker/mysql
 
 # 忽略所有tif文件
 *.tif

@@ -16,3 +16,11 @@ rabbitmq:
   port: 5672
   username: flashpipi
   password: A123456
+
+mongodb:
+  url: 127.0.0.1
+  port: 27017
+  database: db_iic
+  username: root
+  password: A123456
+  authentication-database: admin

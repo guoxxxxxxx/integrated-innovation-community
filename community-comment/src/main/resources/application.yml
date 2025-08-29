@@ -17,6 +17,13 @@ spring:
       port: ${redis.port}
       database: 0
       password: ${redis.password}
+    mongodb:
+      host: ${mongodb.url}
+      port: ${mongodb.port}
+      database: ${mongodb.database}
+      username: ${mongodb.username}
+      password: ${mongodb.password}
+      authentication-database: ${mongodb.authentication-database}
   cloud:
     nacos:
       discovery:

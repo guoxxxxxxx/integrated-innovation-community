@@ -64,6 +64,23 @@ services:
       - iic-network
     restart: always
 
+  mongodb:
+    container_name: iic-mongodb
+    image: mongodb/mongodb-community-server:7.0-ubuntu2204
+    ports:
+      - "27017:27017"
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: root
+      MONGODB_INITDB_ROOT_PASSWORD: A123456
+    volumes:
+      - ./mongo/data:/data/db
+      - ./mongo/config:/data/configdb
+    networks:
+      - iic-network
+    restart: always
+    privileged: true
+
+
 networks:
   iic-network:
     driver: bridge

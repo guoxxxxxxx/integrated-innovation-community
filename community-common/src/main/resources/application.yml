@@ -18,7 +18,7 @@ spring:
     virtual-host: /
 
 auth-config:
-  enableSSO: false    # 是否开启单点登录 默认为false
+  enableSSO: false    # 是否开启仅有一个用户登录 默认为false
 
 
 
