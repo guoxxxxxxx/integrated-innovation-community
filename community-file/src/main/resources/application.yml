@@ -51,3 +51,17 @@ file:
   default-output-path: /home/guox/file/output/      # Linux环境下默认存储路径
   default-ffmpeg-path: /usr/bin/ffmpeg
   chunk-size: 5242880  # 5MB 分块大小默认为5MB
+
+xxl:
+  job:
+    admin:
+      accessToken: default_token
+      timeout: 3
+      addresses: http://192.168.2.4:18080/xxl-job-admin
+    executor:
+      appname: file-clean-executor
+      address:
+      ip:
+      port: 9999
+      logpath: /home/guox/tmp_logs/xxl_job
+      logretentiondays: 30

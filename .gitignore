@@ -36,6 +36,7 @@ build/
 docker/data
 docker/mongo
 docker/mysql
+docker/xxl_job
 
 # 忽略所有tif文件
 *.tif
