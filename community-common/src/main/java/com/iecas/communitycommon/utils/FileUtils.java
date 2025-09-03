@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -231,7 +232,7 @@ public class FileUtils {
 
 
     /**
-     * 重置文件类型
+     * 重命名文件类型
      * @param filePath 文件路径
      * @param originType 原始文件类型
      * @return 新的文件路径
@@ -268,5 +269,25 @@ public class FileUtils {
             }
         }
         return result.toString();
+    }
+
+
+    /**
+     * 根据文件路径删除指定文件
+     * @param filePath 文件路径
+     * @return 删除状态
+     */
+    public static Boolean delete(String filePath){
+        if (filePath == null || filePath.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            Path path = Paths.get(filePath);
+            // 如果文件不存在，也返回 true
+            return Files.deleteIfExists(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -37,6 +37,7 @@ docker/data
 docker/mongo
 docker/mysql
 docker/xxl_job
+docker/redis
 
 # 忽略所有tif文件
 *.tif

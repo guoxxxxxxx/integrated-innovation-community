@@ -54,6 +54,8 @@ services:
       - "6379:6379"
     environment:
       REDIS_PASSWORD: A123456
+    volumes:
+      - ./redis/data:/data
     command: [
       "redis-server",
       "--requirepass", "A123456",

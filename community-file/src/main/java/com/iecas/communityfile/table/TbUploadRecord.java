@@ -53,4 +53,12 @@ public class TbUploadRecord {
     @Comment("删除标志位")
     @Column(name = "deleted", columnDefinition = "BOOL DEFAULT FALSE")
     private Boolean deleted;
+
+    @Comment("临时文件的存储路径")
+    @Column(name = "tmp_file_save_path", columnDefinition = "TEXT")
+    private String tmpFileSavePath;
+
+    @Comment("临时文件存在状态")
+    @Column(name = "tmp_file_status", columnDefinition = "TINYINT DEFAULT 1")
+    private Boolean tmpFileStatus;
 }

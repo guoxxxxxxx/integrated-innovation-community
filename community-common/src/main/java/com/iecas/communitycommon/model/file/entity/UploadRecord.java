@@ -67,6 +67,16 @@ public class UploadRecord implements Serializable {
      * 上传用户id
      */
     private Long userId;
-    
+
+    /**
+     * 临时文件的存储路径
+     */
+    private String tmpFileSavePath;
+
+    /**
+     * 临时文件的存在状态
+     */
+    private Boolean tmpFileStatus;
+
 }
 

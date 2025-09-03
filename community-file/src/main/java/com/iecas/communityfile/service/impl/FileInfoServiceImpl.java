@@ -240,18 +240,20 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
 
         UserInfo currentUser = UserThreadLocal.getUserInfo();
 
+        // 计算分块数
+        int chunkCount = (int)Math.ceil((double) dto.getFileSize() / CHUNK_SIZE);
+        // 生成中间信息
+        FileUploadPreHandleVO vo = new FileUploadPreHandleVO(chunkCount);
+
         // 生成记录信息并存入数据库
         UploadRecord record = UploadRecord.builder()
                 .filename(dto.getFilename())
                 .status("RUNNING")
                 .uploadStartTime(new Date())
+                .tmpFileSavePath(FileUtils.pathJoin(DEFAULT_SAVE_PATH, "originVideos/", vo.getFileUUID() + ".iic_cache_tmp"))
                 .userId(currentUser.getId()).build();
         uploadRecordService.save(record);
 
-        // 计算分块数
-        int chunkCount = (int)Math.ceil((double) dto.getFileSize() / CHUNK_SIZE);
-        // 生成中间信息
-        FileUploadPreHandleVO vo = new FileUploadPreHandleVO(chunkCount);
         vo.setRecordId(record.getId());
         vo.setMd5(dto.getMd5());
         vo.setOriginFilename(dto.getFilename());
@@ -399,6 +401,7 @@ public class FileInfoServiceImpl extends ServiceImpl<UploadInfoDao, FileInfo> im
                     .fileId(fileInfo.getId())
                     .status("SUCCESS")
                     .uploadAchieveTime(new Date())
+                    .tmpFileStatus(false)
                     .id(cacheEntity.getRecordId()).build();
             uploadRecordService.updateById(updateRecord);
 
