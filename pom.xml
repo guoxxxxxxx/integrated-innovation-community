@@ -17,5 +17,6 @@
         <module>community-video</module>
         <module>community-file</module>
         <module>community-comment</module>
+        <module>community-graph</module>
     </modules>
 </project>

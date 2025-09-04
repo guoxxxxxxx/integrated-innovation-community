@@ -1,11 +1,13 @@
 package com.iecas.communityvideo.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.iecas.communitycommon.common.CommonResult;
 import com.iecas.communitycommon.common.PageResult;
+import com.iecas.communitycommon.constant.RedisPrefix;
 import com.iecas.communitycommon.feign.UserServiceFeign;
 import com.iecas.communitycommon.model.user.entity.UserInfo;
 import com.iecas.communitycommon.model.video.entity.VideoCategoryInfo;
@@ -16,11 +18,15 @@ import com.iecas.communityvideo.pojo.Params.QueryCondition;
 import com.iecas.communityvideo.service.VideoCategoryService;
 import com.iecas.communityvideo.service.VideoInfoService;
 import jakarta.annotation.Resource;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * (VideoInfo)表服务实现类
@@ -39,6 +45,12 @@ public class VideoInfoServiceImpl extends ServiceImpl<VideoInfoDao, VideoInfo> i
 
     @Resource
     VideoCategoryService videoCategoryService;
+
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    RedissonClient redissonClient;
 
     @Override
     public PageResult<VideoInfo> getPage(QueryCondition condition) {
@@ -74,19 +86,81 @@ public class VideoInfoServiceImpl extends ServiceImpl<VideoInfoDao, VideoInfo> i
 
     @Override
     public VideoInfo queryVideoInfoById(Long id) {
-        VideoInfo videoInfo = baseMapper.selectById(id);
-        videoInfo.viewCountIncrement();
-        // 更新数据 TODO 此处需要添加并发控制 但是不添加也无所谓，毕竟不是重要数据，丢了就丢了
-        baseMapper.updateById(videoInfo);
-        // 查询当前视频对应的用户的信息
-        CommonResult commonResult = userServiceFeign.queryUserInfoById(videoInfo.getUserId());
-        UserInfo userInfo = CommonResultUtils.parseCommonResult(commonResult, UserInfo.class);
-        videoInfo.setUser(userInfo);
 
-        // 查询当前视频对象的类别名称
-        VideoCategoryInfo categoryName = videoCategoryService.getById(videoInfo.getCategoryId());
-        videoInfo.setCategoryName(categoryName.getCategory());
-        return videoInfo;
+        // 查询缓存
+        String videoInfoCacheJSON = stringRedisTemplate.opsForValue().get(RedisPrefix.VIDEO_INFO_CACHE.getPath(id));
+        if (videoInfoCacheJSON != null && !videoInfoCacheJSON.isEmpty()){
+            VideoInfo videoInfoCache = JSON.parseObject(videoInfoCacheJSON, VideoInfo.class);
+            // 查询最新的播放量
+            Long increment = stringRedisTemplate.opsForValue().increment(RedisPrefix.VIDEO_PLAYS_COUNT.getPath(id));
+            // 将变化标志位置为1
+            stringRedisTemplate.opsForValue().set(RedisPrefix.VIDEO_PLAYS_COUNT_CHANGE_FLAG.getPath(id), "1");
+            videoInfoCache.setViewCount(increment);
+            return videoInfoCache;
+        }
+
+        // 缓存未命中，添加锁避免缓存击穿
+        RLock lock = redissonClient.getLock(RedisPrefix.VIDEO_INFO_CACHE_LOCK.getPath(id));
+
+        try {
+            if (lock.tryLock(5, 10, TimeUnit.SECONDS)) {
+                // 双查缓存, 防止重复溯源
+                String cache = stringRedisTemplate.opsForValue().get(RedisPrefix.VIDEO_INFO_CACHE.getPath(id));
+                if (cache != null && !cache.isEmpty()) {
+                    VideoInfo videoInfo = JSON.parseObject(cache, VideoInfo.class);
+                    Long increment = stringRedisTemplate.opsForValue().increment(RedisPrefix.VIDEO_PLAYS_COUNT.getPath(id));
+                    // 将变化标志位置为1
+                    stringRedisTemplate.opsForValue().set(RedisPrefix.VIDEO_PLAYS_COUNT_CHANGE_FLAG.getPath(id), "1");
+                    if (increment != null && increment != 0L)
+                        videoInfo.setViewCount(increment);
+                    return videoInfo;
+                }
+
+                VideoInfo videoInfo = baseMapper.selectById(id);
+                // 查询当前视频对应的用户的信息
+                CommonResult commonResult = userServiceFeign.queryUserInfoById(videoInfo.getUserId());
+                UserInfo userInfo = CommonResultUtils.parseCommonResult(commonResult, UserInfo.class);
+                videoInfo.setUser(userInfo);
+
+                // 查询当前视频对象的类别名称
+                VideoCategoryInfo categoryName = videoCategoryService.getById(videoInfo.getCategoryId());
+                videoInfo.setCategoryName(categoryName.getCategory());
+
+                // 将查询到的信息保存至缓存中，采用定时清除策略，来保证缓存与数据库的一致性, 采用随机缓存时间来确保缓存不会雪崩
+                stringRedisTemplate.opsForValue().set(RedisPrefix.VIDEO_INFO_CACHE.getPath(id),
+                        JSON.toJSONString(videoInfo), 40 + (int) (Math.random() * 20), TimeUnit.MINUTES);
+                // 将视频播放量也存入到cache中
+                stringRedisTemplate.opsForValue().set(RedisPrefix.VIDEO_PLAYS_COUNT.getPath(id),
+                        String.valueOf(videoInfo.getViewCount()));
+                stringRedisTemplate.opsForValue().increment(RedisPrefix.VIDEO_PLAYS_COUNT.getPath(id));
+                // 将变化标志位置为1
+                stringRedisTemplate.opsForValue().set(RedisPrefix.VIDEO_PLAYS_COUNT_CHANGE_FLAG.getPath(id), "1");
+                return videoInfo;
+            }
+            else {
+                Thread.sleep(100);
+                // 查询缓存
+                String secondQuery = stringRedisTemplate.opsForValue().get(RedisPrefix.VIDEO_INFO_CACHE.getPath(id));
+                if (secondQuery != null && !secondQuery.isEmpty()){
+                    VideoInfo videoInfoCache = JSON.parseObject(secondQuery, VideoInfo.class);
+                    // 查询最新的播放量
+                    Long increment = stringRedisTemplate.opsForValue().increment(RedisPrefix.VIDEO_PLAYS_COUNT.getPath(id));
+                    // 将变化标志位置为1
+                    stringRedisTemplate.opsForValue().set(RedisPrefix.VIDEO_PLAYS_COUNT_CHANGE_FLAG.getPath(id), "1");
+                    videoInfoCache.setViewCount(increment);
+                    return videoInfoCache;
+                }
+                else {
+                    return baseMapper.selectById(id);
+                }
+            }
+        } catch (InterruptedException e){
+            throw new RuntimeException("获取视频信息失败");
+        } finally {
+            if (lock.isHeldByCurrentThread()){
+                lock.unlock();
+            }
+        }
     }
 }
 

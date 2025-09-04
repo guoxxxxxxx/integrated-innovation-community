@@ -51,6 +51,26 @@ public enum RedisPrefix {
      * 文件分块上传信息
      */
     FILE_UPLOAD_CHUNK_INFO("file:upload:chunkInfo:"),
+
+    /**
+     * 视频播放量信息缓存前缀
+     */
+    VIDEO_PLAYS_COUNT("video:plays:count:"),
+
+    /**
+     * 视频播发量变化标志位
+     */
+    VIDEO_PLAYS_COUNT_CHANGE_FLAG("video:plays:count:change:flag:"),
+
+    /**
+     * 视频信息缓存
+     */
+    VIDEO_INFO_CACHE("video:info:cache:"),
+
+    /**
+     * 视频信息缓存锁
+     */
+    VIDEO_INFO_CACHE_LOCK("video:info:cache:lock:")
     ;
 
 
@@ -64,5 +84,9 @@ public enum RedisPrefix {
 
     public String getPath(String key) {
         return PREFIX + key;
+    }
+
+    public String getPath(long key) {
+        return PREFIX + String.valueOf(key);
     }
 }
